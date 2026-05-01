@@ -1,0 +1,27 @@
+.excl-button-box-container {
+    display: flex;
+    background-color: var(--gray-100);
+    border-radius: var(--rounded-xl);
+    padding: var(--spacing-1);
+}
+
+.excl-button {
+    flex: 1;
+    padding: var(--spacing-2) 0;
+    background-color: transparent;
+    border-radius: var(--rounded-lg);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    color: var(--gray-500);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.excl-button-active {
+    box-shadow: var(--shadow-sm);
+    background-color: var(--white);
+    color: var(--gray-900);
+}
+
+

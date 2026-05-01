@@ -1,0 +1,39 @@
+.blocked-card-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    width: 100%;
+}
+
+.icon-time-reason-container{
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.time-badge{
+    background-color: rgb(255 255 255 / 0.5);
+    padding: var(--spacing-0\.5) var(--spacing-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--rounded);
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    color: var(--gray-500);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-200);
+  border: 1px solid var(--border-subtle);
+  color: var(--gray-500);
+  border-radius: 9999px;
+  padding: var(--spacing-2);
+}
+
+.reason-text {
+  font-weight: 700;
+  color: var(--gray-700);
+}

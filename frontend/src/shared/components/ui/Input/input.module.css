@@ -1,0 +1,105 @@
+/* Contenedor base para ambos */
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.input-container input {
+    width: 100%;
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--rounded-xl);
+    background-color: var(--gray-50);
+    color: var(--gray-500);
+    border: 1px solid var(--border-subtle);
+    font-weight: var(--font-bold);
+    transition: border-color 0.2s;
+    cursor: pointer;
+}
+
+.input-container input:focus {
+    outline: none;
+    border-color: var(--gray-400);
+}
+
+.input-container label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    color: var(--gray-400);
+    font-weight: var(--font-bold);
+}
+
+
+.input-container input::placeholder {
+    text-transform: uppercase;
+    letter-spacing: 0.5px; 
+  color: var(--gray-400);
+  font-size: var(--text-xs); 
+}
+
+/* --- VARIANTE INLINE (El de Disponibilidad) --- */
+.input-container-inline {
+    position: relative;
+    background-color: var(--gray-50);
+    border: 1px solid var(--border-subtle);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--rounded-lg);
+}
+
+.input-container-inline input {
+    background: transparent;
+    border: none;
+    height: 100%;
+    width: 100%;
+    color: var(--gray-900);
+    padding: 0; 
+}
+
+/* El foco lo maneja el padre para que parezca una sola pieza */
+.input-container-inline:focus-within {
+    border-color: var(--gray-400);
+}
+
+.input-container-inline label {
+    font-size: 10px; /* Muy chiquito */
+    margin-bottom: 0px; /* Pegadito al input */
+    z-index: 1; /* Para que esté por encima del input */
+    pointer-events: none; /* Que no moleste al hacer click */
+    color: var(--gray-400);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon{
+    position: absolute;
+    left: var(--spacing-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+}
+
+.input-container .input-with-icon {
+    padding-left: var(--spacing-10); 
+}
+
+.eyeButton {
+  position: absolute;
+  right: var(--spacing-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.eyeButton:hover {
+  color: var(--gray-700);
+}

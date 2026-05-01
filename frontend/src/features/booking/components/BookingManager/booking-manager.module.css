@@ -1,0 +1,15 @@
+.booking-manager-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+}
+
+.button-container-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin-top: 20px;
+    width: 100%;
+}
+

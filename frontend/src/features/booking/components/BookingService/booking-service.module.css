@@ -1,0 +1,38 @@
+.service-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.card-title-duration{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.card-price-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-title{
+    font-weight: var(--font-bold);
+}
+
+.card-duration{
+    font-size: var(--text-sm);
+}
+
+.card-price{
+    font-weight: var(--font-bold);
+    font-size: var(--text-lg);
+}

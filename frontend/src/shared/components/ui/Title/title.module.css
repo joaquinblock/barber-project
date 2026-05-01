@@ -1,0 +1,24 @@
+.title{
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.text-title{
+    font-size: var(--text-xl);
+    line-height: var(--text-2xl);
+    font-weight: var(--font-black);
+    color: var(--gray-900);
+}
+
+.text-subtitle{
+   color: var(--gray-500);
+    font-size: var(--text-xs); 
+}
+
+.title-container{
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1-5);
+    margin-bottom: var(--spacing-4);
+}

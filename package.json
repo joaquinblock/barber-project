@@ -1,0 +1,25 @@
+{
+  "name": "barber-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "packages/shared"
+  ],
+  "scripts": {
+    "db:up": "docker-compose --env-file ./backend/.env up -d",
+    "db:down": "docker-compose down",
+    "dev:backend": "npm run start:dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev": "concurrently \"npm run db:up && npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

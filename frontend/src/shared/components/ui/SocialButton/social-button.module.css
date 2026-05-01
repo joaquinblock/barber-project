@@ -1,0 +1,24 @@
+.btn-social {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+  cursor: pointer;
+  gap: var(--spacing-2);
+}
+
+.btn-social.google {
+  background: var(--color-google-bg);
+  box-shadow: var(--shadow);
+}
+
+.btn-social.facebook {
+  background: var(--color-facebook-bg);
+  color: #fff;
+}

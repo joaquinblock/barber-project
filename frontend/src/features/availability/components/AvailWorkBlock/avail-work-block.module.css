@@ -1,0 +1,22 @@
+.avail-work-block{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: var(--spacing-1-5);
+}
+
+.avail-work-block-separator{
+    color: var(--gray-300);
+    font-weight: var(--font-bold);
+}
+
+.avail-work-block-trash-icon{
+    size: 18px;
+    color: var(--gray-400);
+    cursor: pointer;
+}
+
+.avail-work-block-trash-icon:hover{
+    color: var(--red-600);
+}

@@ -1,0 +1,14 @@
+.avail-section{
+  border-radius: var(--rounded-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.avail-work-block-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  background-color: var(--card-bg);
+  padding: var(--spacing-4);
+}

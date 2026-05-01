@@ -1,0 +1,176 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+:root {
+  /* --- COLORES (Palette) --- */
+
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+
+  --card-bg: var(--white);
+  --card-foreground: var(--gray-900);
+
+  --popover-bg: var(--white);
+  --popover-foreground: var(--gray-900);
+
+  --primary: oklch(0.2 0.02 260);
+  --primary-foreground: var(--white);
+
+  --muted-foreground: var(--gray-500);
+
+  --accent: var(--gold);
+  --accent-deep: var(--gold-deep);
+  --accent-deeper: var(--gold-deeper);
+
+  --border: var(--gray-100); /* borde estándar— cards, panels, separadores */
+  --border-subtle: var(
+    --gray-200
+  ); /* borde sutil — inputs dentro de cards, divisores internos */
+  --border-strong: var(
+    --gray-300
+  ); /* borde fuerte — para énfasis o separación importante */
+
+  --surface: var(--white);
+
+  --input-bg: var(--white);
+
+  --ring: var(--gray-300);
+
+  --white: #ffffff;
+  --black: #000000;
+  --white-10: rgba(255, 255, 255, 0.1);
+  --emerald: oklch(0.5 0.12 160);
+  --emerald-deep: oklch(0.52 0.1 160);
+  --green-balanced: oklch(0.58 0.13 155);
+  --gold: oklch(71% 0.11 75);
+    --gold-deep: oklch(61% 0.06 82);
+    --gold-deeper: oklch(42% 0.09 75);
+
+  --gradient-midnight-neon: linear-gradient(
+    135deg,
+    oklch(60% 0.22 300) 0%,/* Purple */ 
+    oklch(55% 0.18 250) 45%,  /* Blue transition */
+     oklch(20% 0.02 250) 100% /* Slate Deep */
+  );
+
+  /* Gray (Cool Gray) */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  --slate-50: #f8fafc;
+  --slate-300: #cbd5e1;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  /* Green (Success) */
+  --green-50: #f0fdf4;
+  --green-100: #dcfce7;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-700: #15803d;
+
+  /* Blue (Primary) */
+  --blue-50: #eff6ff;
+  --blue-600: #2563eb;
+
+  /* Yellow (Warning) */
+  --yellow-50: #fefce8;
+  --yellow-100: #fef9c3;
+  --yellow-600: #ca8a04;
+  --yellow-800: #854d0e;
+
+  /* Red (Danger) */
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-200: #fecaca;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-900: #7f1d1d;
+
+  --orange-500: #f97316;
+
+  /* Colores sociales */
+  --color-facebook-bg: #1877f2;
+  --color-google-bg: #fff;
+
+  /* --- SPACING (La escala de Tailwind: 1 = 0.25rem = 4px) --- */
+  --spacing-0-5: 0.125rem; /* 2px  */
+  --spacing-1: 0.25rem; /* 4px  */
+  --spacing-1-5: 0.375rem; /* 6px  */
+  --spacing-2: 0.5rem; /* 8px  */
+  --spacing-2-5: 0.625rem; /* 10px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-3-5: 0.875rem; /* 14px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-5: 1.25rem; /* 20px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-8: 2rem; /* 32px */
+  --spacing-9: 2.25rem; /* 36px */
+  --spacing-10: 2.5rem; /* 40px */
+  --spacing-12: 3rem; /* 48px */
+  --spacing-15: 3.75rem; /* 60px */
+  --spacing-20: 5rem; /* 80px */
+
+  /* --- BORDER RADIUS (Rounded) --- */
+  --rounded-sm: 0.125rem; /* 2px */
+  --rounded: 0.25rem; /* 4px */
+  --rounded-md: 0.375rem; /* 6px */
+  --rounded-lg: 0.5rem; /* 8px */
+  --rounded-xl: 0.75rem; /* 12px */
+  --rounded-2xl: 1rem; /* 16px */
+  --rounded-3xl: 1.5rem; /* 24px */
+  --rounded-full: 9999px;
+
+  /* --- SHADOWS (Box Shadow) --- */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* --- FONT SIZE (Text) --- */
+  --text-xxs: 0.625rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* --- FONT WEIGHT --- */
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-black: 900;
+
+  /* --- MAX WIDTH --- */
+  --max-width: 480px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  min-height: 100vh;
+  background-color: var(--background);
+  padding: var(--spacing-6);
+}

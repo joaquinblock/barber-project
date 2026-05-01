@@ -1,0 +1,10 @@
+.avail-day-header {
+     display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.avail-day-header-span {
+     font-weight: var(--font-bold);
+    color: var(--gray-800);
+}

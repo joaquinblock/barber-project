@@ -1,0 +1,20 @@
+.text-info{
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.card-title {
+    font-weight: var(--font-bold);
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+}
+
+.card-price {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.active{
+    color: var(--accent-deeper);
+}

@@ -1,0 +1,9 @@
+.login-container {
+  width: 75%;          /* En pantallas chicas, usa casi todo */
+  max-width: 420px;    /* En pantallas grandes, se planta ahí y no crece más */
+  margin: 0 auto;      /* Lo centra horizontalmente */
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-6);
+  gap: var(--spacing-6);
+}

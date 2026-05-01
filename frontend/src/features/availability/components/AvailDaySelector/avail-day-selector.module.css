@@ -1,0 +1,10 @@
+.day-selector{
+    /* display: grid;
+    grid-template-columns: repeat(7, 1fr); 7 columnas iguales */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;   
+    gap: var(--spacing-2); /* Un gap pequeño para que no se peguen */
+    width: 100%;
+    padding: var(--spacing-4) var(--spacing-2);
+}

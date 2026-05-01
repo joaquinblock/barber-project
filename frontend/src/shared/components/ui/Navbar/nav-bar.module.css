@@ -1,0 +1,24 @@
+.navbar-container {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  z-index: 40;
+  box-shadow: var(--shadow-sm);
+}
+
+
+.tabs-container {
+  display: flex;
+  gap: var(--spacing-1);
+  overflow-x: auto;
+  
+  /* Ocultar Scrollbar (Chrome, Safari, Opera) */
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+/* Ocultar Scrollbar (Standard) */
+.tabs-container::-webkit-scrollbar {
+  display: none;
+}

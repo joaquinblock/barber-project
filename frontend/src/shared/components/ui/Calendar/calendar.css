@@ -1,0 +1,72 @@
+.calendar-container {
+    background-color: white;
+    border-radius: var(--rounded-2xl); 
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rdp-month_grid{
+    border-collapse: separate;
+}
+.rdp-month_caption{
+    text-transform: capitalize;
+    font-weight: var(--font-black);
+    font-size: var(--text-lg);
+    color: var(--gray-900);
+}
+.rdp-today:not(.rdp-selected){         
+  font-weight: bold;
+}
+
+.rdp-selected {
+  background-color: var(--gray-900);
+  color: white;
+  font-weight: bold;
+  
+  border: none;
+  box-shadow: none; 
+  
+  border-radius: var(--rounded-xl);
+}
+
+.rdp-day.rdp-today{
+    border-radius: var(--rounded-xl);
+}
+
+/* Los dias lu, ma, mi ...*/
+.rdp-weekday{
+    color: var(--gray-400);
+}
+
+.rdp-day_button{
+    font-size: var(--text-sm);
+}
+
+.rdp-chevron{
+    fill: var(--gray-500);
+    width: 20px;
+    height: 20px;
+}
+
+.rdp-caption_label{
+    padding: 0 var(--spacing-4);
+    font-size: var(--text-lg);
+    font-weight: var(--font-black);
+    color: var(--gray-900);
+}
+
+.rdp-root{
+    --rdp-accent-color: var(--accent); 
+    --rdp-selected-border: none;
+}
+
+.rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button {
+    background-color: var(--green-600) !important;
+    color: white !important;
+    border-radius: var(--rounded-xl);
+    margin: auto;
+}

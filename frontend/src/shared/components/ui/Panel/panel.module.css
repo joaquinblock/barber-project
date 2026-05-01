@@ -1,0 +1,7 @@
+.panel{
+    background-color: var(--card-bg);
+    border-radius: var(--rounded-2xl);
+    padding: var(--spacing-4) var(--spacing-5);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}

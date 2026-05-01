@@ -1,0 +1,13 @@
+.appt-work-day-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-1) 0;
+    width: 100%;
+}
+
+.appt-list-work-block-container{
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-5);
+}
