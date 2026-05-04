@@ -1,4 +1,4 @@
-import type { Appt } from "@/shared/types/appt";
+import type { Appt } from "@/features/appointments/types";
 
 export const mockApptsByDate: Record<string, Appt[]> = {
   "2026-04-13": [

@@ -1,21 +1,21 @@
-import type { DayKey, TimeRange } from '@barber/shared/types';
+import type { DayKey, TimeRangeResponse } from '@barber/shared/types';
 
 /*export type DailyAvailability = {
     isWorking: boolean;
-    intervals?: TimeRange[]; // Solo tiene sentido si isWorking es true. Si es false, se ignora este campo.
+    intervals?: TimeRangeResponse[]; // Solo tiene sentido si isWorking es true. Si es false, se ignora este campo.
 };  
 
  Esto no va porque queremos que chequee el isWorking en cada bloque, para evitar inconsistencias. Si el día no tiene bloques, se asume que no labura ese día.
 */
 
 type WorkingDay = {
-    DayKey: DayKey;
+    dayKey: DayKey;
     isWorking: true;
-    intervals: [TimeRange, ...TimeRange[]]; //Esto obliga a que si isWorking es true, tenga al menos un bloque de trabajo. Si no tiene bloques, se asume que no labura ese día.
+    intervals: [TimeRangeResponse, ...TimeRangeResponse[]]; //Esto obliga a que si isWorking es true, tenga al menos un bloque de trabajo. Si no tiene bloques, se asume que no labura ese día.
 };
 
 type NonWorkingDay = {
-    DayKey: DayKey;
+    dayKey: DayKey;
     isWorking: false;
     intervals?: never; // ✅ No existe cuando no trabaja con ? para que la propiedad sea opcional y no obligatoria
 };

@@ -20,6 +20,9 @@ export class Barbershop {
   @Column({ type: 'varchar', length: 255, nullable: true })
   address?: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  photoUrl?: string;
+
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone?: string;
 

@@ -15,3 +15,4 @@ export {EmptyState} from './EmptyState/EmptyState';
 export {SocialButton} from './SocialButton/SocialButton';
 export {Panel} from './Panel/Panel';
 export {Calendar} from './Calendar/Calendar';
+export {FeatureErrorBoundary} from './FeatureErrorBoundary/FeatureErrorBoundary';

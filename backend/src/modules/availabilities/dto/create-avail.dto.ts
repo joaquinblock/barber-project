@@ -1,45 +1,32 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
-  ArrayMinSize,
-  IsArray,
-  IsBoolean,
   IsEnum,
   IsNotEmpty,
-  IsOptional,
+  IsString,
   IsUUID,
-  ValidateIf,
-  ValidateNested,
+  Matches
 } from 'class-validator';
-import { TimeIntervalDto } from './time-interval.dto';
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
-import { IsNotOverlap } from '@/common/helpers/validators/is-not-overlap.validator';
+import { IsValidInterval } from '@/common/helpers/validators/is-valid-interval.validator';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
+import type { AvailabilityDTO } from '@barber/shared/types';
 
-export class CreateAvailDto {
+export class CreateAvailDto implements AvailabilityDTO {
   @IsEnum(DayOfWeek, {
     message: `Día no válido. Opciones: ${Object.values(DayOfWeek).join(', ')}`,
   })
   dayOfWeek!: DayOfWeek;
 
-  @IsNotEmpty({ message: 'isWorking es obligatorio' })
-  @IsBoolean({ message: 'isWorking debe ser un booleano' })
-  isWorking!: boolean;
-  
-  @Transform(({ value, obj }) => {
-    // Si el barbero dice que NO trabaja, forzamos que intervals sea null
-    if (obj.isWorking === false) return null;
-    return value;
-  })
-  @ValidateIf((o) => o.isWorking === true) // Solo valida intervals si isWorking es true, osea si trabajas tenes que tener intervalos de tiempo, sino no es necesario
-  @IsArray({ message: 'intervals debe ser un arreglo' })
-  @ArrayMinSize(1, {
-    message: 'Si trabajas, debes tener al menos un intervalo de tiempo',
-  })
-  @IsNotOverlap({ message: 'Los intervalos de tiempo no pueden solaparse' })
-  @ValidateNested({ each: true }) // Valida cada objeto dentro del arreglo
-  @Type(() => TimeIntervalDto)
-  @IsOptional()
-  intervals?: TimeIntervalDto[];
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^([01]\d|2[0-3]):?([0-5]\d)$/, { message: 'startTime debe ser HH:mm' })
+  startTime!: string;
+
+  @IsValidInterval()
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^([01]\d|2[0-3]):?([0-5]\d)$/, { message: 'endTime debe ser HH:mm' })
+  endTime!: string;
 
   @Trim()
   @IsNotEmpty({ message: 'El barberId es obligatorio' })

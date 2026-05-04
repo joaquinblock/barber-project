@@ -2,11 +2,11 @@ import { Modal, Button, Input } from "@/shared/components/ui";
 import { useState } from "react";
 import { Alert } from "@/shared/components/ui";
 import { CircleAlert } from "lucide-react";
-import type { TimeRange, HourString } from "@/shared/types";
+import type { HourString, TimeRangeRequest } from "@barber/shared/types";
 
 type AvailAddBlockModalProps = {
   onClose: () => void;
-  onConfirm: (timeRange: TimeRange) => boolean;
+  onConfirm: (timeRange: TimeRangeRequest) => Promise<boolean> | boolean;
   errorMessage?: string | null;
 };
 
@@ -15,10 +15,15 @@ export const AvailAddBlockModal = ({
   onConfirm,
   errorMessage,
 }: AvailAddBlockModalProps) => {
-  const [localBlock, setLocalBlock] = useState<TimeRange>({
+  const [localBlock, setLocalBlock] = useState<TimeRangeRequest>({
     startTime: "00:00" as HourString,
     endTime: "00:00" as HourString,
   });
+
+  const handleConfirm = async () => {
+    // onConfirm en el padre ya se encarga de cerrar si es exitoso
+    await onConfirm(localBlock);
+  };
 
   return (
     <Modal text="Agregar bloque de trabajo" onClose={onClose}>
@@ -42,7 +47,7 @@ export const AvailAddBlockModal = ({
         </Alert>
       )}
       <Button 
-        onClick={() => onConfirm(localBlock) && onClose()}
+        onClick={handleConfirm}
         disabled={!localBlock.startTime || !localBlock.endTime}
         variant="primary"
       >

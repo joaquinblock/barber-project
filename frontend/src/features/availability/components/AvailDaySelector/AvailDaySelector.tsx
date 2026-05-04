@@ -1,7 +1,8 @@
-import type { DayKey } from '@/shared/types';
-import type { WeeklyAvailability } from '@/shared/types';
+import type { DayKey} from '@barber/shared/types';
+import type { WeeklyAvailability } from '../../types';
 import styles from './avail-day-selector.module.css';
 import { DayButton } from '@/shared/components/ui';
+import { DAYS_CONFIG } from '@/shared/constants/days';
 
 
 type DaySelectorProps = {
@@ -10,7 +11,7 @@ type DaySelectorProps = {
   onSelectDay: (day: DayKey) => void;
 };
 
-export const AvailDaySelector = ({selectedDay = 'L',schedule, onSelectDay  }: DaySelectorProps) => {
+export const AvailDaySelector = ({selectedDay = 'MON',schedule, onSelectDay  }: DaySelectorProps) => {
   // Obtenemos los días dinámicamente de las llaves del objeto
   const days = Object.keys(schedule) as DayKey[];
 
@@ -19,7 +20,7 @@ export const AvailDaySelector = ({selectedDay = 'L',schedule, onSelectDay  }: Da
         {days.map((day) => (
             <DayButton
                 key={day}
-                text={day}
+                text={DAYS_CONFIG[day].letter}
                 active={day === selectedDay}
                 hasWork={schedule[day].isWorking}
                 onClick={() => onSelectDay(day)}

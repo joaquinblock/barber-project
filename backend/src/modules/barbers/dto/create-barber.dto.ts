@@ -55,7 +55,7 @@ export class CreateBarberDto extends CreateUserDto {
   isAvailable?: boolean = true; // Por defecto, el barbero estará disponible
   @IsOptional()
   @IsBoolean({ message: 'isAdmin debe ser un valor booleano' })
-  isAdmin?: boolean = false; // Valor por defecto a false
+  isAdmin: boolean = false; // Valor por defecto a false
 
   @Trim()
   @IsNotEmpty({ message: 'El barbershopId es obligatorio' })

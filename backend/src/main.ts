@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +17,9 @@ async function bootstrap() {
     transform: true, // Transforma los payloads a los tipos definidos en los DTOs
     transformOptions: { enableImplicitConversion: false }, // Permite la conversión implícita de tipos (ej: string a number). Lo pongo en false porque no funciona bien con los booleanos, así que uso un transform específico para eso en los DTOs (ver src/common/helpers/transforms/to-boolean.transform.ts)
   }));
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
   
   await app.listen(process.env.PORT ?? 3000);
 }

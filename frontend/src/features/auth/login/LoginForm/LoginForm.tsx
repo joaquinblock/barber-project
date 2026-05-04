@@ -1,5 +1,5 @@
 import { Input, Button, Alert } from '@/shared/components/ui';
-import { Mail, Lock } from 'lucide-react'; // Tus iconos
+import { Mail, Lock, AlertCircle } from 'lucide-react'; // Tus iconos
 import styles from './login-form.module.css';
 import { AuthLink } from '../../components/AuthLink/AuthLink';
 import type { LoginCredentials } from '@/core/auth/types';
@@ -43,7 +43,7 @@ export const LoginForm = ({onLogin, isLoading, errorMsg}: LoginFormProps) => {
           {isLoading ? <span className={styles.spinner}></span> : "Iniciar sesión"}
         </Button>
       {errorMsg && (
-        <Alert variant="error">
+        <Alert variant="error" iconLeft={AlertCircle}>
           {errorMsg}
         </Alert>
       )} {/* Muestra el mensaje de error si existe */}

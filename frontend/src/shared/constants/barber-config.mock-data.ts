@@ -7,42 +7,49 @@ export const barberConfigMock: BarberConfig = {
         { id: "s2", title: "Afeitado clásico", price: 10000, duration: 20 },
         { id: "s3", title: "Corte + Afeitado", price: 22000, duration: 50 },
     ],
-    availability: {
+    availabilities: {
         'MON': {
+            dayKey: 'MON',
             isWorking: true,
             intervals: [
                 { id: "i1", startTime: "09:00", endTime: "18:00" },
             ],
         },
         'TUE': {
+            dayKey: 'TUE',
             isWorking: true,
             intervals: [
                 { id: "i2", startTime: "10:00", endTime: "17:00" },
             ],
         },
         'WED': {
+            dayKey: 'WED',
             isWorking: false,
-            intervals: [],
+            //intervals: [],
         },
         'THU': {
+            dayKey: 'THU',
             isWorking: true,
             intervals: [
                 { id: "i3", startTime: "11:00", endTime: "19:00" },
             ],
         },
         'FRI': {
+            dayKey: 'FRI',
             isWorking: true,
             intervals: [
                 { id: "i4", startTime: "09:00", endTime: "18:00" },
             ],
         },
         'SAT': {
+            dayKey: 'SAT',
             isWorking: false,
-            intervals: [],
+            //intervals: [],
         },
         'SUN': {
+            dayKey: 'SUN',
             isWorking: false,
-            intervals: [],
+            //intervals: [],
         }
      },
     exceptions: [

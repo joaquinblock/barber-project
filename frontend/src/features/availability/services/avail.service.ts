@@ -1,7 +1,6 @@
 import type { OperationResult} from "@/shared/types";
 import type { AvailErrorCode } from "../types";
-import type { AvailabilityDTO, TimeRange } from "@barber/shared/types";
-import type { Availability, WeeklyAvailability } from "@/shared/types/avail";
+import type { AvailabilityDTO, AvailabilityResponseDTO} from "@barber/shared/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,7 +13,7 @@ export const AvailService = {
   async getByBarber(
     barberId: string,
     barbershopId: string,
-  ): Promise<OperationResult<WeeklyAvailability, AvailErrorCode>> {
+  ): Promise<OperationResult<AvailabilityResponseDTO[], AvailErrorCode>> {
     try {
       const response = await fetch(
         `${AVAILABILITY_ENDPOINT}/barbers/${barberId}?barbershopId=${barbershopId}`,
@@ -27,51 +26,15 @@ export const AvailService = {
         },
       );
 
-      const data = await response.json();
+      const body = await response.json();
 
-      if (!response.ok) {
-        return {
-          success: false,
-          error: {
-            code: data.code ?? "SERVER_ERROR",
-            message: data.message ?? "Error al obtener disponibilidad",
-          },
-        };
+      if (!body.success) {
+        return body as OperationResult<never, AvailErrorCode>;
       }
 
-      const items: any[] = Array.isArray(data) ? data : [data];
+      const items: AvailabilityResponseDTO[] = Array.isArray(body.data) ? body.data : [body.data];
 
-      //El mapeo es necesario para transformar la respuesta del backend al formato que espera el frontend, especialmente para manejar los días que no vienen en la respuesta (asumiendo que son no laborables) y para adaptar la estructura de los intervalos.
-      const availabilitiesMap: WeeklyAvailability = { //es solo por formato, el backend puede devolver solo los días que tienen disponibilidad configurada, y el frontend asume que los días faltantes son no laborables
-        MON: { DayKey: "MON", isWorking: false },
-        TUE: { DayKey: "TUE", isWorking: false },
-        WED: { DayKey: "WED", isWorking: false },
-        THU: { DayKey: "THU", isWorking: false },
-        FRI: { DayKey: "FRI", isWorking: false },
-        SAT: { DayKey: "SAT", isWorking: false },
-        SUN: { DayKey: "SUN", isWorking: false },
-      };
-
-      items.forEach((item) => {
-        const dayKey = item.day as keyof WeeklyAvailability;
-        if (!(dayKey in availabilitiesMap)) {
-          console.warn(`Día desconocido:`);
-          return;
-        }
-        // Si isWorking es true, mapeamos intervalos. Si es false, intervals no debe existir.
-        availabilitiesMap[dayKey] = item.isWorking
-          ? {
-              DayKey: dayKey,
-              isWorking: true,
-              intervals: (item.intervals ?? []).map((interval: any) => ({
-                startTime: interval.startTime,
-                endTime: interval.endTime,
-              })) as [TimeRange, ...TimeRange[]],
-            }
-          : { DayKey: dayKey, isWorking: false }; // Aquí intervals no existe (gracias al tipo 'never')
-      });
-
-      return { success: true, data: availabilitiesMap };
+      return { success: true, data: items };
     } catch (e) {
       return {
         success: false,
@@ -88,7 +51,7 @@ export const AvailService = {
    */
   async create(
     createAvailDto: AvailabilityDTO,
-  ): Promise<OperationResult<Availability, AvailErrorCode>> {
+  ): Promise<OperationResult<AvailabilityResponseDTO, AvailErrorCode>> {
     try {
       const response = await fetch(`${AVAILABILITY_ENDPOINT}`, {
         method: "POST",
@@ -99,24 +62,86 @@ export const AvailService = {
         body: JSON.stringify(createAvailDto),
       });
 
-      const data = await response.json();
+      const body = await response.json();
 
-      if (!response.ok) {
-        return {
-          success: false,
-          error: {
-            code: data.code ?? "AVAIL_NETWORK_ERROR", // Respetamos el code del backend
-            message: data.message ?? "Error desconocido",
-          },
-        };
+      if (!body.success) {
+        return body as OperationResult<never, AvailErrorCode>;
       }
 
       return {
         success: true,
-        data,
+        data: body.data,
       };
     } catch (e) {
       // Error de red, timeout, JSON malformado, etc.
+      return {
+        success: false,
+        error: {
+          code: "SERVER_ERROR",
+          message: e instanceof Error ? e.message : "Error de red",
+        },
+      };
+    }
+  },
+
+  /**
+   * DELETE: Elimina un intervalo de disponibilidad.
+   */
+  async delete(rangeId: string): Promise<OperationResult<void, AvailErrorCode>> {
+    try {
+      const response = await fetch(`${AVAILABILITY_ENDPOINT}/${rangeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const body = await response.json();
+
+      if (!body.success) {
+        return body as OperationResult<never, AvailErrorCode>;
+      }
+
+      return { success: true, data: undefined };
+    } catch (e) {
+      return {
+        success: false,
+        error: {
+          code: "SERVER_ERROR",
+          message: e instanceof Error ? e.message : "Error de red",
+        },
+      };
+    }
+  },
+
+  /**
+   * DELETE: Elimina todos los intervalos de un día para un barbero.
+   */
+  async deleteByDay(
+    barberId: string,
+    day: string,
+  ): Promise<OperationResult<void, AvailErrorCode>> {
+    try {
+      const response = await fetch(
+        `${AVAILABILITY_ENDPOINT}/barbers/${barberId}/days/${day}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const body = await response.json();
+
+      if (!body.success) {
+        return body as OperationResult<never, AvailErrorCode>;
+      }
+
+      return { success: true, data: undefined };
+    } catch (e) {
       return {
         success: false,
         error: {

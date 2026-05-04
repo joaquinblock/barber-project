@@ -19,8 +19,9 @@ describe('CreateBarbershopDto', () => {
     const dto = {
       name: 'La Barbería de Joaco',
       address: 'Calle Falsa 123, Olavarría',
-      phone: '2284214618',
-      isActive: true
+      phone: '2284 23 53 13',
+      isActive: true,
+      photoUrl: 'https://example.com/barbershop.jpg'
     };
 
     const errors = await validateDto(dto);

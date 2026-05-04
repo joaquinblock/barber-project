@@ -1,15 +1,16 @@
-import { Button, EmptyState, List, Modal, Panel } from "@/shared/components/ui";
-import type { Exception } from "@/shared/types";
+import { Button, EmptyState, List, Modal, Panel, FeatureErrorBoundary } from "@/shared/components/ui";
+import type { Exception } from "@barber/shared/types";
 import { Calendar, Plus } from "lucide-react";
 import styles from "./excl-manager.module.css";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { ExclCard, ExclModal } from "@/features/exclusions/components";
 import { useExcl } from "@/features/exclusions/hooks/useExcl";
 
 type ExclManagerProps = {
   exclusions: ReturnType<typeof useExcl>;
 };
-export const ExclManager = ({ exclusions }: ExclManagerProps) => {
+
+const ExclManagerContent = ({ exclusions }: ExclManagerProps) => {
   const { exceptions, addException, deleteException } = exclusions;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -48,3 +49,12 @@ export const ExclManager = ({ exclusions }: ExclManagerProps) => {
     </>
   );
 };
+
+export const ExclManager = (props: ExclManagerProps) => (
+  <FeatureErrorBoundary featureName="Exclusions">
+    <Suspense fallback={<div>Cargando exclusiones...</div>}>
+      <ExclManagerContent {...props} />
+    </Suspense>
+  </FeatureErrorBoundary>
+);
+

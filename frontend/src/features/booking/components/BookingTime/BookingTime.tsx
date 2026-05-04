@@ -1,5 +1,5 @@
 import type { WeeklyAvailability } from "@/shared/types/barber-config";
-import type { Appt } from "@/shared/types/appt";
+import type { Appt } from "@/features/appointments/types";
 import type { DateKey, HourString } from "@/shared/types";
 import { formatDateToDayKey, isSlotOccupied } from "@/shared/utils/time-utils";
 import { generateTimeSlots } from "@/shared/utils/time-utils";

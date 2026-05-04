@@ -1,4 +1,4 @@
-import type { Appt } from "@/shared/types/appt";
+import type { Appt } from "../types";
 
 /**
  * Genera el texto que verá el usuario para la hora del turno o bloqueo

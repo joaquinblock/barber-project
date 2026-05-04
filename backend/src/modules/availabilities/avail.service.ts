@@ -12,8 +12,9 @@ export class AvailService {
     private readonly availRepository: Repository<Avail>,
   ) {}
 
-  create(createAvailDto: CreateAvailDto) {
-    return 'This action adds a new availability';
+  async create(createAvailDto: CreateAvailDto): Promise<Avail> {
+    const newAvail = this.availRepository.create(createAvailDto);
+    return this.availRepository.save(newAvail);
   }
 
   async findByBarber(barberId: string): Promise<Avail[]> {
@@ -22,15 +23,15 @@ export class AvailService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} availability`;
+  findOne(id: string) {
+    return this.availRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateAvailDto: UpdateAvailDto) {
-    return `This action updates a #${id} availability`;
+  async remove(id: string) {
+    await this.availRepository.delete(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} availability`;
+  async removeByDay(barberId: string, dayOfWeek: string) {
+    await this.availRepository.delete({ barberId, dayOfWeek: dayOfWeek as any });
   }
 }

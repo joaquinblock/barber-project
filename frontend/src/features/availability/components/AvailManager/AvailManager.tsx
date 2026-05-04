@@ -1,33 +1,36 @@
-import {
-  DAYS_ABBREVIATED,
-  DAY_NAMES,
-} from "@/features/availability/constants/mockData";
 import { AVAIL_ERROR_MESSAGES } from "../../constants/error";
 import { Clock } from "lucide-react";
 import { useState } from "react";
 import styles from "./avail-manager.module.css";
 import type { AvailErrorCode } from "../../types";
-import type { DayKey, TimeRange} from "@barber/shared/types";
+import type { DayKey, TimeRangeRequest} from "@barber/shared/types";
+import { DAYS_CONFIG } from "@/shared/constants/days";
+import { Suspense } from "react";
 
 import {
   AvailDaySelector,
   AvailDayHeader,
   AvailTimeRange,
   AvailAddBlockModal,
-} from "@/features/availability";
+} from "@/features/availability/components";
 import { EmptyState, Title } from "@/shared/components/ui";
 import { useAvail } from "../../hooks/useAvail";
+
+import { FeatureErrorBoundary } from "@/shared/components/ui";
 
 type AvailManagerProps = {
   barberId: string 
   barbershopId: string
 };
-export const AvailManager = ({ barberId, barbershopId }: AvailManagerProps) => {
-  // 1. Traemos el motor de datos del Hook
-  const { schedule, addInterval } = useAvail(barberId, barbershopId);
+
+const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
+  
+  const { schedule, addInterval, deleteInterval, toggleWorkingStatus } = useAvail(barberId, barbershopId);
+
+  if (!schedule) return null;
 
   // 2. Solo datos de presntación y UI
-  const [daySelected, setDaySelected] = useState<DayKey>(DAYS_ABBREVIATED[0]);
+  const [daySelected, setDaySelected] = useState<DayKey>('MON');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorAddBlock, setErrorAddBlock] = useState<string | null>(null);
 
@@ -46,31 +49,33 @@ export const AvailManager = ({ barberId, barbershopId }: AvailManagerProps) => {
       schedule[day].isWorking &&
       schedule[day].intervals.length === 0
     ) {
-      toogleWorkingStatus(day, false);
+      toggleWorkingStatus(day, false);
     }
   };
 
-  // const handleToggle = (val: boolean) => {
-  //   //Tenemos que llamar primero porque sino no cambia el estado del switch
-  //   //En handleCloseModal hacemos la validación de si el user prendió el switch pero no cargó nada, lo apagamos de nuevo.
-  //   toogleWorkingStatus(daySelected, val);
+  const handleToggle = (val: boolean) => {
+    //Tenemos que llamar primero porque sino no cambia el estado del switch
+    //En handleCloseModal hacemos la validación de si el user prendió el switch pero no cargó nada, lo apagamos de nuevo.
+    toggleWorkingStatus(daySelected, val);
 
-  //   if (val && schedule[daySelected].intervals.length === 0) {
-  //     handleOpenModalAddBlock(); // 2. Si falta data, pedila
-  //   }
-  // };
+    const dayData = schedule[daySelected];
+    if (val && dayData.isWorking && (dayData.intervals?.length ?? 0) === 0) {
+      handleOpenModalAddBlock(); // 2. Si falta data, pedila
+    }
+  };
 
   const handleSelectDay = (day: DayKey) => setDaySelected(day);
 
-  const handleDelete = (id: string) => deleteBlock(daySelected, id);
+  const handleDelete = (id: string) => deleteInterval(daySelected, id);
 
-  const handleConfirmAdd = (timeRange: TimeRange): boolean => {
+  const handleConfirmAdd = async (timeRange: TimeRangeRequest): Promise<boolean> => {
     // 1. Limpiamos el rastro de errores viejos
     setErrorAddBlock(null);
 
-    const result = addInterval(daySelected, timeRange);
+    const result = await addInterval(daySelected, timeRange);
 
     if (result.success) {
+      handleCloseModal(daySelected, true);
       return true;
     } else {
       const code = result.error?.code as AvailErrorCode;
@@ -94,14 +99,14 @@ export const AvailManager = ({ barberId, barbershopId }: AvailManagerProps) => {
         ></AvailDaySelector>
         <div className={styles.availWorkBlockSection}>
           <AvailDayHeader
-            day={DAY_NAMES[daySelected]}
+            day={DAYS_CONFIG[daySelected].full}
             isWorking={schedule[daySelected].isWorking}
             onChange={handleToggle}
           ></AvailDayHeader>
 
           {schedule[daySelected].isWorking ? (
             <AvailTimeRange
-              items={schedule[daySelected].intervals}
+              items={schedule[daySelected].isWorking ? schedule[daySelected].intervals : []}
               onClickAddBlock={handleOpenModalAddBlock}
               onDelete={handleDelete}
             ></AvailTimeRange>
@@ -123,3 +128,11 @@ export const AvailManager = ({ barberId, barbershopId }: AvailManagerProps) => {
     </div>
   );
 };
+
+export const AvailManager = (props: AvailManagerProps) => (
+  <FeatureErrorBoundary featureName="Availability">
+    <Suspense fallback={<div>Loading...</div>}>
+      <AvailManagerContent {...props} />
+    </Suspense>
+  </FeatureErrorBoundary>
+);

@@ -4,3 +4,7 @@ export * from "./user.types";
 export * from "./barber.types";
 export * from "./customer.types";
 export * from "./auth.types";
+export * from "./appt.types";
+export * from "./exception.types";
+export * from "./offer.types";
+export * from "./barbershop.types";

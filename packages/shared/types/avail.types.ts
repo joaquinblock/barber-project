@@ -1,10 +1,13 @@
-import type { DayKey, TimeRange } from "./time.types";
+import type { DayKey } from "./time.types";
 
 export type AvailabilityDTO = {
-  id: string;
   dayOfWeek: DayKey;
-  isWorking: boolean;
-  intervals: TimeRange[] | null;
+  startTime: string;
+  endTime: string;
   barberId: string;
   barbershopId: string;
+};
+
+export type AvailabilityResponseDTO = AvailabilityDTO & {
+  id: string;
 };

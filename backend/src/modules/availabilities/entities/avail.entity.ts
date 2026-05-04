@@ -18,12 +18,11 @@ export class Avail {
   @Column({ type: 'enum', enum: DayOfWeek })
   dayOfWeek!: DayOfWeek; // Ej: 'MON', 'TUE', 'WED', etc.
 
-  @Column({ name: 'is_working', default: true })
-  isWorking!: boolean;
+  @Column({ type: 'time', name: 'start_time' })
+  startTime!: string;
 
-  // Guardamos los intervalos como un JSONB (Poder puro de Postgres)
-  @Column({ type: 'jsonb', nullable: true })
-  intervals?: { startTime: string; endTime: string }[] | null; // Ej: [{ startTime: "09:00", endTime: "17:00" }, { startTime: "18:00", endTime: "21:00" }]
+  @Column({ type: 'time', name: 'end_time' })
+  endTime!: string;
 
   @Column({ name: 'barber_id' })
   barberId!: string;

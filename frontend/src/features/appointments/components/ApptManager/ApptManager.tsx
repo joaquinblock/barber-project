@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { formatDateToKey } from "@/shared/utils/time-utils";
 import type { ApptErrorCode, BanFormData } from "@/features/appointments/types";
 import {
@@ -6,22 +6,21 @@ import {
   ApptWorkBlock,
   ApptBanModal,
 } from "@/features/appointments";
-import { Button, Calendar, Title } from "@/shared/components/ui";
+import { Button, Calendar, Title, FeatureErrorBoundary } from "@/shared/components/ui";
 import { Ban, Briefcase } from "lucide-react";
 import { formatDateToDisplay } from "@/shared/utils/time-utils";
 import { useAppointments } from "../../hooks/useAppt";
 import { APPT_ERROR_MESSAGES } from "../../constants/error";
 import { formatDateToDayKey } from "@/shared/utils/time-utils";
-import { useAvailability } from "@/features/availability/hooks/useAvail";
-import type { DateKey } from "@/shared/types";
+import type { DateKey, PublicAvailabilityState } from "@barber/shared/types";
 import styles from "./appt-manager.module.css";
 
 type ApptManagerProps = {
   appt: ReturnType<typeof useAppointments>;
-  availability: ReturnType<typeof useAvailability>;
+  availability: PublicAvailabilityState;
 };
 
-export const ApptManager = ({ appt, availability }: ApptManagerProps) => {
+const ApptManagerContent = ({ appt, availability }: ApptManagerProps) => {
   // 1. El Hook maneja la data
   const { appts, addBlock, deleteItem } = appt;
   const { schedule } = availability; //es para mostrar el bloque de atención del día
@@ -95,13 +94,13 @@ export const ApptManager = ({ appt, availability }: ApptManagerProps) => {
           <ApptWorkBlock
             title="Horario de atención hoy"
             subtitle={
-              schedule[dayKey].isWorking
+              schedule?.[dayKey]?.isWorking
                 ? "Configurado en Modalidad"
                 : "Día no laboral"
             }
             icon={Briefcase}
-            intervals={schedule[dayKey].intervals} // <-- Le pasamos el array real
-            isWorking={schedule[dayKey].isWorking} // <-- Le pasamos el estado real
+            intervals={schedule?.[dayKey]?.intervals || []}
+            isWorking={schedule?.[dayKey]?.isWorking || false}
           />
           <ApptList appts={appts[daySelected] || []} onDelete={handleDelete} />
         </div>
@@ -118,3 +117,12 @@ export const ApptManager = ({ appt, availability }: ApptManagerProps) => {
     </>
   );
 };
+
+export const ApptManager = (props: ApptManagerProps) => (
+  <FeatureErrorBoundary featureName="Appointments">
+    <Suspense fallback={<div>Cargando turnos...</div>}>
+      <ApptManagerContent {...props} />
+    </Suspense>
+  </FeatureErrorBoundary>
+);
+

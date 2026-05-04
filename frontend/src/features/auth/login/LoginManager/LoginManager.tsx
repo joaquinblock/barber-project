@@ -3,42 +3,37 @@ import { SocialProviderList } from "../SocialProviderList/SocialProviderList";
 import { LoginForm } from "../LoginForm/LoginForm";
 import styles from "./login-manager.module.css";
 import type { LoginCredentials } from "@/core/auth/types";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useAuth } from "@/core/auth/context/auth.context";
-import { useNavigate } from "react-router";
-import { AuthError } from "@/core/errors/AuthError";
-import { ROUTES_PATH } from "@/core/auth/constants/auth-routes.constants";
+import { useParams } from "react-router-dom";
+import { FeatureErrorBoundary } from "@/shared/components/ui";
+import { AuthError } from "@/core/auth/errors/auth.error";
 
-export const LoginManager = () => {
-  const {login} = useAuth(); // Obtenemos el método de login y el estado de carga del contexto de autenticación
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const navigate = useNavigate();
+const LoginManagerContent = () => {
+  const { login, isLoading } = useAuth(); // Obtenemos el método de login y el error del contexto
+  const { slug } = useParams<{ slug: string }>();
+  const [error, setError] = useState<string | null>(null);
   
   function handelSelectProvider(providerId: string) {
     console.log(`Selected provider: ${providerId}`);
   }
 
   const handleLogin = async (credentials: LoginCredentials) => {
-    setErrorMsg(null);
+    if (!slug) {
+      console.error("No se encontró el slug de la barbería en la URL");
+      return;
+    }
+    
     try {
-      const user = await login(credentials);
-
-      //if(isAdmin) no va porque se produce un stale state, el contexto no se actualiza a tiempo para que isAdmin refleje el nuevo estado. Por eso verificamos el rol directamente con user.role
-      
-      if (user.role === "admin") {
-        console.log("Redirigiendo a admin... " + ROUTES_PATH.ADMIN.ROOT);
-        navigate(ROUTES_PATH.ADMIN.ROOT, { replace: true }); // Usamos replace para que no puedan volver al login con el botón de atrás
-      } else if (user.role === "employee") {
-        navigate(ROUTES_PATH.EMPLOYEE.DASHBOARD, { replace: true });
-      } else if (user.role === "customer") {
-        navigate(ROUTES_PATH.CUSTOMER.DASHBOARD, { replace: true });
-      }
-    } catch (error) {
-      if(error instanceof AuthError) {
-        setErrorMsg(error.message);
-      } else {
-        setErrorMsg("Ocurrió un error inesperado. Por favor, intenta de nuevo.");
-      }
+      await login(credentials, slug);
+    } catch (e) {
+       if(e instanceof AuthError) {
+        console.log(e.message);
+        setError(e.message);
+       }else{
+        console.log(e);
+        setError("Ocurrió un error inesperado, intenta más tarde.");
+       }
     }
   }
 
@@ -46,7 +41,7 @@ export const LoginManager = () => {
     <div>
       <AuthHeader></AuthHeader>
       <div className={styles.loginContainer}>
-        <LoginForm onLogin={handleLogin} errorMsg={errorMsg}></LoginForm>
+        <LoginForm onLogin={handleLogin} errorMsg={error} isLoading={isLoading}></LoginForm>
         <SocialProviderList
           onSelect={handelSelectProvider}
         ></SocialProviderList>
@@ -54,3 +49,12 @@ export const LoginManager = () => {
     </div>
   );
 };
+
+export const LoginManager = () => (
+  <FeatureErrorBoundary featureName="Login">
+    <Suspense fallback={<div>Cargando...</div>}>
+      <LoginManagerContent />
+    </Suspense>
+  </FeatureErrorBoundary>
+);
+

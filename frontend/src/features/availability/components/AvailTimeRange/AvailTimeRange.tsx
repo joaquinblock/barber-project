@@ -1,11 +1,11 @@
 import { Button, List } from "@/shared/components/ui";
-import { AvailWorkBlock } from "@/features/availability";
+import { AvailWorkBlock } from "@/features/availability/components";
 import { Plus } from "lucide-react";
-import type { TimeInterval } from "@/shared/types";
+import type { TimeRangeResponse } from "@barber/shared/types";
 import styles from "./avail-time-range.module.css";
 
 type AvailTimeRangeProps = {
-    items: TimeInterval[];
+    items: TimeRangeResponse[];
     onClickAddBlock?: () => void;
     onDelete?: (id: string) => void;
 };
@@ -18,7 +18,6 @@ export const AvailTimeRange = ({ items, onClickAddBlock, onDelete }: AvailTimeRa
                 emptyComponent={null}
                 renderItem={(item) => (
                     <AvailWorkBlock
-                        key={item.id}
                         startTime={item.startTime}
                         endTime={item.endTime}
                         isEditable={false}

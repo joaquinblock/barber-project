@@ -1,2 +1,2 @@
 export * from "./error";
-export * from "./appts";
+export * from "./appt";

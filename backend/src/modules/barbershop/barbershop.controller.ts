@@ -4,8 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
-  Patch,
   Post,
 } from '@nestjs/common';
 import { BarbershopService } from '@/modules/barbershop/barbershop.service';
@@ -19,5 +17,15 @@ export class BarbershopController {
   @Post()
   async create(@Body() createBarbershopDto: CreateBarbershopDto): Promise<Barbershop> {
     return await this.barbershopService.create(createBarbershopDto);
+  }
+
+  @Get('slug/:slug')
+  async findOneBySlug(@Param('slug') slug: string) {
+    return await this.barbershopService.findOneBySlug(slug);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.barbershopService.remove(id);
   }
 }

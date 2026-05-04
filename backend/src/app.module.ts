@@ -9,6 +9,7 @@ import { AvailModule } from './modules/availabilities/avail.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ExceptionsModule } from './modules/exceptions/exceptions.module';
 import { BarbershopModule } from './modules/barbershop/barbershop.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { BarbershopModule } from './modules/barbershop/barbershop.module';
 
     ExceptionsModule,
 
-    BarbershopModule
+    BarbershopModule,
+    AuthModule
   ],
 })
 export class AppModule {}

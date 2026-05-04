@@ -7,18 +7,26 @@ import { UpdateAvailDto } from './dto/update-availability.dto';
 export class AvailController {
   constructor(private readonly availService: AvailService) {}
 
-  @Get()
-  findByBarber(@Query('barberId') barberId: string) {
+  @Get('barbers/:barberId')
+  findByBarber(@Param('barberId') barberId: string) {
     return this.availService.findByBarber(barberId);
   }
 
   @Post()
   create(@Body() createAvailDto: CreateAvailDto) {
-    return {
-      message: "¡Éxito! Esto crea una disponibilidad para un barbero específico",
-      data: createAvailDto, // Aquí ves el JSON final
-      timestamp: new Date().toISOString() // Opcional: para saber cuándo se procesó
-    }
+    return this.availService.create(createAvailDto);
   }
 
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.availService.remove(id);
+  }
+
+  @Delete('barbers/:barberId/days/:dayOfWeek')
+  removeByDay(
+    @Param('barberId') barberId: string,
+    @Param('dayOfWeek') dayOfWeek: string,
+  ) {
+    return this.availService.removeByDay(barberId, dayOfWeek);
+  }
 }

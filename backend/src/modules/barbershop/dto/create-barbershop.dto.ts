@@ -17,6 +17,11 @@ export class CreateBarbershopDto {
   address?: string;
 
   @IsOptional()
+  @IsString({ message: 'La URL de la foto debe ser una cadena de texto' })
+  @MaxLength(255, { message: 'La URL de la foto no puede superar los 255 caracteres' })
+  photoUrl?: string;
+
+  @IsOptional()
   @IsString({ message: 'El teléfono debe ser una cadena de texto' })
   @ToPhoneNumber() // Elimina espacios en blanco tanto al inicio como al final y dentro del número
   @IsPhoneNumber('AR', { message: 'El teléfono debe ser un número de teléfono válido' })

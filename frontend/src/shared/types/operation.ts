@@ -4,6 +4,7 @@ export type ErrorCode =
   | 'REQUIRED_FIELDS'
   | 'SERVER_ERROR'
   | 'BARBER_NOT_FOUND'
+  
   | 'BARBERSHOP_NOT_FOUND'
   | 'INVALID_TIME_FORMAT';
 

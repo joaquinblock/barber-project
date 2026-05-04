@@ -1,7 +1,7 @@
+import type { WeeklyAvailability } from '@/features/availability/types';
+import type { Exception } from '@/features/exclusions/types';
+import type { Offers } from '@/features/offers/types';
 
-import type { WeeklyAvailability } from './avail';
-import type { Exception } from './exception';
-import type { Offers } from './offers';
 
 export type BarberConfig = {
     readonly barberId: string;

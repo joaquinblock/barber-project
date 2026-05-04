@@ -1,5 +1,6 @@
-import { createContext, useEffect, useState, useContext, type ReactNode } from "react";
-import type { LoginCredentials, AuthErrorCode } from "../types";
+import { createContext, useContext, type ReactNode } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { LoginCredentials } from "../types";
 import { AuthService } from "../services/auth.service";
 import type { User, UserRole } from "@barber/shared/types";
 
@@ -7,79 +8,80 @@ import type { User, UserRole } from "@barber/shared/types";
 
 export type AuthContextType = {
   user: User | null;
-  barbershopId: string | null; // útil para hooks, no es sensible
+  barbershopId: string | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
-  authError: AuthErrorCode | null;
+  isInitialLoading: boolean; //carga inicial de la app, si existe el token y es valido lo rehidrata
+  isLoading: boolean; // carga del login
   login: (credentials: LoginCredentials, slug: string) => Promise<void>;
   logout: () => void; 
 };
-
-// ─── Context ──────────────────────────────────────────────────────────────────
 
 export const AuthContext = createContext<AuthContextType>(null!);
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [barbershopId, setBarbershopId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [authError, setAuthError] = useState<AuthErrorCode | null>(null);
+  const queryClient = useQueryClient();
 
-  // Rehidratación — recupera sesión si el usuario refresca la página
-  useEffect(() => {
-    const savedUser = localStorage.getItem("auth_user");
-    const savedBarbershopId = localStorage.getItem("auth_barbershop_id");
-    const token = localStorage.getItem("auth_token");
+  // 1. Query para Sesión (Rehidratación)
+  // Reemplaza el useEffect. Intenta validar el token si existe.
+  const { 
+    data: sessionData, 
+    isLoading: isSessionLoading 
+  } = useQuery({
+    queryKey: ['auth', 'session'],
+    queryFn: async () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) return null;
+      
+      try {
+        return await AuthService.getProfile(token);
+      } catch (error) {
+        localStorage.removeItem("auth_token");
+        return null;
+      }
+    },
+    staleTime: Infinity, // La sesión no expira a menos que cerremos sesión o el token sea inválido
+  });
 
-    if (savedUser && savedBarbershopId && token) {
-      setUser(JSON.parse(savedUser));
-      setBarbershopId(savedBarbershopId);
+  // 2. Mutation para Login
+  const loginMutation = useMutation({
+    mutationFn: ({ credentials, slug }: { credentials: LoginCredentials; slug: string }) => 
+      AuthService.login(credentials, slug),
+    onSuccess: (data) => {
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+      localStorage.setItem("auth_barbershop_id", data.barbershopId);
+      
+      // Actualizamos el cache de la sesión
+      queryClient.setQueryData(['auth', 'session'], {
+        user: data.user,
+        barbershopId: data.barbershopId
+      });
     }
-    setIsLoading(false);
-  }, []);
+  });
 
-  const login = async (credentials: LoginCredentials, slug: string): Promise<void> => {
-    setIsLoading(true);
-    setAuthError(null);
-
-    const result = await AuthService.login(credentials, slug);
-
-    if (!result.success) {
-      setAuthError(result.error.code as AuthErrorCode);
-      setIsLoading(false);
-      return;
-    }
-
-    const { user: apiUser, token, barbershopId: apiBarbershopId } = result.data;
-
-    // Token se guarda pero nunca se expone fuera del contexto
-    localStorage.setItem("auth_token", token);
-    localStorage.setItem("auth_user", JSON.stringify(apiUser));
-    localStorage.setItem("auth_barbershop_id", apiBarbershopId);
-
-    setUser(apiUser);
-    setBarbershopId(apiBarbershopId);
-    setIsLoading(false);
+  const login = async (credentials: LoginCredentials, slug: string) => {
+    await loginMutation.mutateAsync({ credentials, slug });
   };
 
-  // No es async — solo limpia estado y localStorage
   const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
     localStorage.removeItem("auth_barbershop_id");
-    setUser(null);
-    setBarbershopId(null);
-    setAuthError(null);
+    queryClient.setQueryData(['auth', 'session'], null);
+    queryClient.removeQueries({ queryKey: ['auth'] });
   };
+
+  const user = sessionData?.user || null;
+  const barbershopId = sessionData?.barbershopId || null;
 
   const value: AuthContextType = {
     user,
     barbershopId,
     isAuthenticated: !!user,
-    isLoading,
-    authError,
+    isInitialLoading: isSessionLoading,
+    isLoading: loginMutation.isPending,
     login,
     logout,
   };
@@ -95,7 +97,7 @@ export const useAuth = () => {
     throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   }
 
-  const { user } = context;
+  const { user, isInitialLoading } = context;
 
   // ✅ Fix del error de roles — hasRole chequea correctamente el union type
   const hasRole = (role: UserRole): boolean =>
@@ -108,7 +110,8 @@ export const useAuth = () => {
   return {
     ...context,
 
-    // Roles
+    // Estados de carga
+    isInitialLoading,
     isAdmin,
     isBarber,
     isCustomer,

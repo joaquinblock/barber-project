@@ -1,9 +1,9 @@
 import Stepper from "@/shared/components/ui/Stepper/Stepper";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { BookingDate } from "../BookingDate/BookingDate";
 import { BookingService } from "../BookingService/BookingService";
 import { BookingTime } from "../BookingTime/BookingTime";
-import { Button } from "@/shared/components/ui";
+import { Button, FeatureErrorBoundary } from "@/shared/components/ui";
 import styles from "./booking-manager.module.css";
 import type { useBarberConfig } from "@/shared/hooks/useBarberConfig";
 import type { Exception, Service } from "@/shared/types/barber-config";
@@ -16,7 +16,7 @@ type BookingManagerProps = {
   barberConfig: ReturnType<typeof useBarberConfig>;
 };
 
-export const BookingManager = ({ appts, barberConfig }: BookingManagerProps) => {
+const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
@@ -152,3 +152,12 @@ export const BookingManager = ({ appts, barberConfig }: BookingManagerProps) => 
     </div>
   );
 };
+
+export const BookingManager = (props: BookingManagerProps) => (
+  <FeatureErrorBoundary featureName="Booking">
+    <Suspense fallback={<div>Cargando reserva...</div>}>
+      <BookingManagerContent {...props} />
+    </Suspense>
+  </FeatureErrorBoundary>
+);
+

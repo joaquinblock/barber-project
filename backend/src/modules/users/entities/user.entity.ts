@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { UserRole } from '../enum/user-role.enum';
 import { Customer } from '@/modules/customers/entities/customer.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 
@@ -18,6 +19,7 @@ export class User {
   email!: string;
 
   @Column()
+  @Exclude() // Oculta la contraseña en la respuesta JSON
   password!: string;
 
   @Column({ 

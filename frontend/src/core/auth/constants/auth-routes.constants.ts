@@ -1,8 +1,8 @@
 
 export const ROUTES_PATH = {
   PUBLIC: {
-    LOGIN: '/login',
-    REGISTER: '/register',
+    LOGIN: '/:slug/login',
+    REGISTER: '/:slug/register',
   },
   ADMIN: {
     ROOT: '/employee',

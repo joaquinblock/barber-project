@@ -3,28 +3,28 @@ import type { Customer } from './customer.types';
 
 export type UserRole = 'ADMIN' | 'BARBER' | 'CUSTOMER';
 
-type BaseUser = {
+export type BaseUser = {
   id: string;
   email: string;
   fullName: string;
   phone: string | null;
   isActive: boolean;
-  avatarUrl?: string | null;
+  avatarUrl: string | null;
 };
 
-type AdminUser = BaseUser & {
+export type AdminUser = BaseUser & {
   roles: ('ADMIN')[];
   barber?: never; // Para asegurarnos de que un admin no tenga un perfil de barbero
   customer?: never; // Para asegurarnos de que un admin no tenga un perfil de cliente
 };
 
-type BarberUser = BaseUser & {
+export type BarberUser = BaseUser & {
   roles: ('BARBER' | 'ADMIN')[];
   barber: Barber; // Objeto completo del perfil
   customer?: never; // Para asegurarnos de que un barber no tenga un perfil de cliente
 };
 
-type CustomerUser = BaseUser & {
+export type CustomerUser = BaseUser & {
   roles: ('CUSTOMER')[];
   customer: Customer; // Objeto completo del perfil
   barber?: never; // Para asegurarnos de que un cliente no tenga un perfil de barbero
