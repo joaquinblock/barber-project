@@ -11,6 +11,7 @@ import { BarberUserDto } from '../barbers/dto/barber-user.dto';
 import { CustomerUserDto } from '../customers/dto/customer-user.dto';
 import { AdminUserDto } from '../users/dto/admin-user.dto';
 import { Logger } from '@nestjs/common';
+import { ErrorCode } from '@barber/shared/errors';
 
 @Injectable()
 export class AuthService {
@@ -31,27 +32,33 @@ export class AuthService {
     // 2. Validar Usuario
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('El usuario no existe');
+      throw new UnauthorizedException({
+        code: ErrorCode.AUTH_USER_NOT_FOUND,
+        message: 'No se encontró una cuenta con ese correo electrónico',
+      });
     }
 
     // 3. Validar Contraseña
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('La contraseña es incorrecta');
+      throw new UnauthorizedException({
+        code: ErrorCode.AUTH_INVALID_CREDENTIALS,
+        message: 'La contraseña es incorrecta',
+      });
     }
 
     // 4. Validar Pertenencia y Roles
     // El rol CUSTOMER es global, pero BARBER debe pertenecer a la barbería del slug
     if (user.roles.includes(UserRole.BARBER)) {
       if (!user.barber || user.barber.barbershopId !== barbershop.id) {
-        throw new ForbiddenException('No tienes permiso para acceder a esta barbería como barbero');
+        throw new ForbiddenException({
+          code: ErrorCode.AUTH_FORBIDDEN,
+          message: 'No tenés permiso para acceder a esta barbería como barbero',
+        });
       }
     }
 
     this.logger.log(`User ${user.email} logged in successfully`);
-
-    // Si es CUSTOMER (o ADMIN), permitimos el acceso globalmente por ahora 
-    // (o podrías añadir lógica específica si Admin tiene restricciones)
 
     // 5. Generar Token
     const payload = { 
@@ -61,7 +68,7 @@ export class AuthService {
       barbershopId: barbershop.id 
     };
 
-    const token = this.jwtService.sign(payload); //payload es el objeto que se va a firmar, con el JWT Service 
+    const token = this.jwtService.sign(payload);
 
     // 6. Preparar Respuesta mapeando al contrato compartido
     return {
@@ -75,14 +82,20 @@ export class AuthService {
     try {
       const payload = this.jwtService.verify(token);
       const user = await this.usersService.findOneByEmail(payload.email);
-      if (!user) throw new UnauthorizedException();
+      if (!user) throw new UnauthorizedException({
+        code: ErrorCode.AUTH_TOKEN_INVALID,
+        message: 'Token inválido o expirado',
+      });
       
       return {
         user: this.mapUserToContract(user),
         barbershopId: payload.barbershopId,
       };
     } catch (e) {
-      throw new UnauthorizedException('Token inválido o expirado');
+      throw new UnauthorizedException({
+        code: ErrorCode.AUTH_TOKEN_INVALID,
+        message: 'Token inválido o expirado',
+      });
     }
   }
 

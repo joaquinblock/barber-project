@@ -7,6 +7,7 @@ export interface Response<T> {
   data: T;
 }
 
+// Para que siempre devuelva un obeto con formato {success: boolean, data: T}
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {

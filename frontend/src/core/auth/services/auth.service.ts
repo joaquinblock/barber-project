@@ -1,4 +1,4 @@
-import { api } from "../utils/api.wrapper";
+import { api } from "../../api/utils/api.wrapper";
 import type { LoginCredentials } from "../types";
 import type { LoginResponseDTO } from "@barber/shared/types";
 

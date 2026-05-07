@@ -2,5 +2,10 @@
   "name": "@barber/shared",
   "version": "1.0.0",
   "main": "./src/index.ts",
-  "types": "./src/index.ts"
+  "types": "./src/index.ts",
+  "exports": {
+    ".": { "default": "./src/index.ts" },
+    "./types": { "default": "./src/types/index.ts" },
+    "./errors": { "default": "./src/errors/index.ts" }
+  }
 }

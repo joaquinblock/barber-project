@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ErrorCode } from '@barber/shared/errors';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
@@ -33,7 +34,10 @@ export class BarbershopService {
     const barbershop = await this.barbershopRepository.findOneBy({ slug });
 
     if (!barbershop) {
-      throw new NotFoundException(`Barbería con slug "${slug}" no encontrada.`);
+      throw new NotFoundException({
+        code: ErrorCode.BARBERSHOP_NOT_FOUND,
+        message: `Barbería con slug "${slug}" no encontrada.`,
+      });
     }
 
     return barbershop;
@@ -42,7 +46,10 @@ export class BarbershopService {
   async remove(id: string): Promise<void> {
     const result = await this.barbershopRepository.delete({ id });
     if (result.affected === 0) {
-      throw new NotFoundException(`Barbería con ID "${id}" no encontrada.`);
+      throw new NotFoundException({
+        code: ErrorCode.BARBERSHOP_NOT_FOUND,
+        message: `Barbería con ID "${id}" no encontrada.`,
+      });
     }
   }
 }

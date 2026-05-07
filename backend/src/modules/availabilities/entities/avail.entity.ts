@@ -3,7 +3,9 @@ import {
   Column, 
   ManyToOne, 
   JoinColumn, 
-  PrimaryGeneratedColumn, 
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn, 
 } from 'typeorm';
 import { Barber } from '@/modules/barbers/entities/barber.entity';
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
@@ -24,6 +26,13 @@ export class Avail {
   @Column({ type: 'time', name: 'end_time' })
   endTime!: string;
 
+  
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  updatedAt!: Date;
+
   @Column({ name: 'barber_id' })
   barberId!: string;
 
@@ -38,4 +47,5 @@ export class Avail {
   @ManyToOne(() => Barbershop, (barbershop) => barbershop.availabilities, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'barbershop_id' })
   barbershop!: Barbershop;
+
 }

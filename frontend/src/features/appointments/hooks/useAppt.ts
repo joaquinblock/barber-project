@@ -3,20 +3,20 @@ import { findConflict } from "@/shared/utils/time-utils";
 import type {BanFormData} from "../types";
 import type { Appt, DateKey} from "@/shared/types";
 import type { OperationResult } from "@/shared/types";
-import type { ApptErrorCode } from "../types";
+import { ErrorCode } from "@barber/shared/errors";
 
 //Usamos un DateKey para pedir por semana, en la base de datos las consultas son por semana
 
 export const useAppointments = (initialData: Record<DateKey, Appt[]> = {}) => { 
   const [appts, setAppts] = useState<Record<DateKey, Appt[]>>(initialData);
 
-  const addBlock = (formData: BanFormData): OperationResult<Appt, ApptErrorCode> => {
+  const addBlock = (formData: BanFormData): OperationResult<Appt, ErrorCode> => {
     const targetDate = formData.date;
     const dayAppts = appts[targetDate] || [];
     
     // 1. Validaciones de lógica (Globales)
     if (formData.startTime >= formData.endTime) {
-      return { success: false, error: { code: 'INVALID_RANGE', message: '...' } };
+      return { success: false, error: { code: ErrorCode.BAD_REQUEST, message: 'El horario de inicio debe ser anterior al de fin.' } };
     }
 
     // 2. Validación de Conflictos (Específicos de Negocio)
@@ -26,8 +26,7 @@ export const useAppointments = (initialData: Record<DateKey, Appt[]> = {}) => {
       return { 
         success: false, 
         error: { 
-          code: isAppt ? 'BLOCK_OVERLAP_APPT' : 'BLOCK_OVERLAP_BLOCK',
-          // El message crudo lo mandamos por las dudas
+          code: isAppt ? ErrorCode.APPT_BLOCK_OVERLAP_APPT : ErrorCode.APPT_BLOCK_OVERLAP_BLOCK,
           message: isAppt ? `el turno de ${conflict.customer}` : `el bloqueo "${conflict.reason}"`
         } 
       };

@@ -1,5 +1,5 @@
-import { HttpError } from "@/shared/errors";
-import { AUTH_STORAGE_KEYS } from "../constants/auth.constants";
+import { HttpError, ApiError, ErrorCode } from "@barber/shared/errors";
+import { AUTH_STORAGE_KEYS } from "../../auth/constants/auth.constants";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -7,7 +7,7 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   error?: {
-    code: string;
+    code: ErrorCode;
     message: string;
   };
 }
@@ -18,7 +18,7 @@ export interface ApiResponse<T> {
  * - Inyección de tokens y headers comunes.
  * - Soporte para FormData y JSON.
  * - Parseo de JSON.
- * - Lanzamiento de HttpError si la respuesta no es exitosa.
+ * - Distinción entre HttpError (infraestructura) y ApiError (lógica de negocio).
  * - Desempaquetado de la estructura { success, data }.
  */
 const request = async <T>(
@@ -57,19 +57,17 @@ const request = async <T>(
   try {
     body = await response.json();
   } catch (e) {
-    if (!response.ok) {
-      throw new HttpError(response.status, "Error de red o formato de respuesta inválido");
-    }
-    // Si es exitoso pero no es JSON, devolvemos undefined
-    return undefined as T;
+    // No se pudo parsear el JSON — error de infraestructura puro
+    throw new HttpError(response.status, "Error de red o formato de respuesta inválido");
   }
 
   if (!response.ok || !body.success) {
-    throw new HttpError(
-      response.status,
-      body.error?.message || "Error en la petición al servidor",
-      body.error?.code
-    );
+    // Si el backend mandó un code semántico → error de lógica de negocio (ApiError)
+    if (body.error?.code) {
+      throw new ApiError(body.error.code, body.error.message ?? "Error en la petición al servidor");
+    }
+    // Sin code semántico → error de infraestructura (HttpError)
+    throw new HttpError(response.status, body.error?.message ?? "Error en la petición al servidor");
   }
 
   return body.data;

@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ErrorCode } from '@barber/shared/errors';
 import { CreateBarberDto } from './dto/create-barber.dto';
 import { UpdateBarberDto } from './dto/update-barber.dto';
 import { Barber } from './entities/barber.entity';
 import { DataSource, Repository } from 'typeorm';
 import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRole } from '../users/enum/user-role.enum';
+import { UserRole } from '@barber/shared/types';
 import { UsersService } from '../users/users.service';
 import { BarberUser } from '@barber/shared/types';
 import { plainToInstance } from 'class-transformer';
@@ -75,7 +76,7 @@ export class BarbersService {
     // Buscamos el barbero con su usuario para poder mapear después
     const barberToUpdate = await this.barbersRepository.findOne({ where: { id }, relations: { user: true } });
     if (!barberToUpdate) {
-      throw new NotFoundException(`Barber with id ${id} not found`);
+      throw new NotFoundException({ code: ErrorCode.BARBER_NOT_FOUND, message: `Barber with id ${id} not found` });
     }
 
     return await this.dataSource.transaction(async (manager) => {
@@ -123,7 +124,7 @@ export class BarbersService {
   async getBarberByBarberId(barberId: string): Promise<BarberUser> {
     const barber = await this.barbersRepository.findOne({ where: { id: barberId }, relations: { user: true } });
     if (!barber) {
-      throw new NotFoundException(`Barber with id ${barberId} not found`);
+      throw new NotFoundException({ code: ErrorCode.BARBER_NOT_FOUND, message: `Barber with id ${barberId} not found` });
     }
     
     return this.mapToBarberUser(barber);

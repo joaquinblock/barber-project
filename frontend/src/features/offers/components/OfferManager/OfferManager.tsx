@@ -5,12 +5,9 @@ import { Scissors } from "lucide-react";
 import styles from "./offer-manager.module.css";
 import { Suspense } from "react";
 
-type OfferManagerProps = {
-  offers: ReturnType<typeof useOffer>;
-};
 
-const OfferManagerContent = ({ offers }: OfferManagerProps) => {
-  const { services } = offers;
+const OfferManagerContent = () => {
+  const offers = useOffer();
   
   return (
     <Panel title="Mis servicios" subtitle="Selecciona que realizas y personaliza tus precios si es necesario" icon={Scissors}>

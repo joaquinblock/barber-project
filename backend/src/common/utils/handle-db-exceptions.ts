@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PgPostError } from '@/common/enums/pg-post-error.enum';
 import { QueryFailedError } from 'typeorm';
+import { ErrorCode } from '@barber/shared/errors';
 
 type PostgresDriverError = {
 	code?: string;
@@ -32,43 +33,52 @@ export const handleDbExceptions = (
 
 		switch (driverError.code) {
 			case PgPostError.UNIQUE_VIOLATION:
-				throw new ConflictException(`Ya existe un ${entityName} con esos datos`); //Codigo 409, el dato es valido pero ya existe en la base de datos, por lo que no se puede crear un nuevo registro con esos mismos datos.
+				throw new ConflictException({
+					code: ErrorCode.DB_UNIQUE_VIOLATION,
+					message: `Ya existe un ${entityName} con esos datos`,
+				}); //Codigo 409, el dato es valido pero ya existe en la base de datos, por lo que no se puede crear un nuevo registro con esos mismos datos.
 
 			case PgPostError.CHECK_VIOLATION:
 			case PgPostError.EXCLUSION_VIOLATION:
-				throw new ConflictException(
-					`Los datos enviados para ${entityName} no cumplen las reglas de negocio`,
-				);
+				throw new ConflictException({
+					code: ErrorCode.DB_VALIDATION_ERROR,
+					message: `Los datos enviados para ${entityName} no cumplen las reglas de negocio`,
+				});
 
 			case PgPostError.FOREIGN_KEY_VIOLATION:
-				throw new BadRequestException(
-					`Uno de los recursos relacionados para ${entityName} no existe`,
-				);
+				throw new BadRequestException({
+					code: ErrorCode.DB_FOREIGN_KEY_VIOLATION,
+					message: `Uno de los recursos relacionados para ${entityName} no existe`,
+				});
 
 			case PgPostError.NOT_NULL_VIOLATION:
-				throw new BadRequestException(
-					`Faltan campos obligatorios para crear el ${entityName}`,
-				);
+				throw new BadRequestException({
+					code: ErrorCode.DB_VALIDATION_ERROR,
+					message: `Faltan campos obligatorios para crear el ${entityName}`,
+				});
 
 			case PgPostError.INVALID_TEXT_REPRESENTATION:
 			case PgPostError.INVALID_DATETIME_FORMAT:
 			case PgPostError.DATETIME_FIELD_OVERFLOW:
 			case PgPostError.STRING_DATA_RIGHT_TRUNCATION:
 			case PgPostError.NUMERIC_VALUE_OUT_OF_RANGE:
-				throw new BadRequestException(
-					`Uno de los valores enviados para ${entityName} tiene un formato invalido`,
-				);
+				throw new BadRequestException({
+					code: ErrorCode.DB_VALIDATION_ERROR,
+					message: `Uno de los valores enviados para ${entityName} tiene un formato invalido`,
+				});
 
 			case PgPostError.DEADLOCK_DETECTED:
 			case PgPostError.SERIALIZATION_FAILURE:
-				throw new ConflictException(
-					`El servidor está experimentando una alta carga, por favor intenta nuevamente`,
-				);
+				throw new ConflictException({
+					code: ErrorCode.DB_TIMEOUT,
+					message: `El servidor está experimentando una alta carga, por favor intenta nuevamente`,
+				});
 		}
 	}
 
 	logger.error(error);
-	throw new InternalServerErrorException( //El codigo 500 indica que ocurrió un error inesperado en el servidor, lo que significa que no se pudo procesar la solicitud debido a un problema interno. 
-		`Ocurrio un error inesperado al guardar ${entityName}`,
-	);
+	throw new InternalServerErrorException({
+		code: ErrorCode.DB_UNKNOWN_ERROR,
+		message: `Ocurrio un error inesperado al guardar ${entityName}`,
+	});
 };

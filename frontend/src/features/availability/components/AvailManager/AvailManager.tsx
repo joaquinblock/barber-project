@@ -1,8 +1,8 @@
-import { AVAIL_ERROR_MESSAGES } from "../../errors/avail.error.messages";
 import { Clock } from "lucide-react";
 import { useState } from "react";
 import styles from "./avail-manager.module.css";
-import type { AvailErrorCode } from "../../types";
+import { ErrorCode } from "@barber/shared/errors";
+import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 import type { DayKey, TimeRangeRequest} from "@barber/shared/types";
 import { DAYS_CONFIG } from "@/shared/constants/days";
 import { Suspense } from "react";
@@ -83,9 +83,9 @@ const AvailManagerContent = () => {
       handleCloseModal(daySelected, true);
       return true;
     } else {
-      const code = result.error?.code as AvailErrorCode;
+      const code = result.error?.code as ErrorCode;
       const message =
-        AVAIL_ERROR_MESSAGES[code] ||
+        ERROR_MESSAGES[code] ||
         result.error?.message ||
         "Error desconocido";
       setErrorAddBlock(message);

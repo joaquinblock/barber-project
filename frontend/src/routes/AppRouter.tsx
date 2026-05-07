@@ -4,7 +4,7 @@ import { EmployeeLayout } from '@/pages/employee/EmployeeLayout';
 import { BarberConfigPage } from '@/pages/employee/BarberConfigPage';
 import { LoginManager, RegisterManager } from '@/features/auth';
 // import { CustomerPage } from '@/pages/customer/CustomerPage';
-import { ROUTES_PATH } from '@/core/auth/constants/auth-routes.constants';
+import { ROUTES_PATH } from '@/core/auth/constants/auth.routes.constants';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 export const AppRouter = () => {
     return (

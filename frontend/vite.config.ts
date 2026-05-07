@@ -25,6 +25,9 @@ export default defineConfig({
     alias: {
       // Mapea el símbolo @ a la carpeta src de tu proyecto
       '@': path.resolve(__dirname, './src'),
+      '@barber/shared': path.resolve(__dirname, '../packages/shared/src/index.ts'),
+      '@barber/shared/types': path.resolve(__dirname, '../packages/shared/src/types/index.ts'),
+      '@barber/shared/errors': path.resolve(__dirname, '../packages/shared/src/errors/index.ts'),
     },
   }
 })

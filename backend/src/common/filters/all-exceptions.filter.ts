@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
+import { ErrorCode } from '@barber/shared/errors';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -8,28 +9,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let code = 'INTERNAL_SERVER_ERROR';
+    let code: string = ErrorCode.SERVER_ERROR;
     let message = 'Ocurrió un error inesperado en el servidor';
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse() as any;
 
-      // Extract code and message, especially handling class-validator errors
       if (typeof exceptionResponse === 'object') {
-        message = Array.isArray(exceptionResponse.message) 
-          ? exceptionResponse.message[0] // Get first validation error message
+        message = Array.isArray(exceptionResponse.message)
+          ? exceptionResponse.message[0]
           : exceptionResponse.message || exception.message;
-        
-        code = exceptionResponse.error 
-          ? exceptionResponse.error.toUpperCase().replace(/\s+/g, '_') 
-          : 'HTTP_EXCEPTION';
+
+        // Si el servicio lanzó con un `code` semántico propio, lo usamos directamente.
+        // De lo contrario, generamos uno a partir del tipo de error HTTP.
+        code = exceptionResponse.code
+          ?? (exceptionResponse.error
+              ? exceptionResponse.error.toUpperCase().replace(/\s+/g, '_')
+              : 'HTTP_EXCEPTION');
       } else {
         message = exception.message;
       }
     } else if (exception instanceof Error) {
-            message = 'Ocurrio un error inesperado en el servidor';
-            console.log(exception)
+      console.error(exception);
     }
 
     response.status(status).json({

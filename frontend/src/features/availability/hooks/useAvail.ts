@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { AvailService } from "../services/avail.service";
 import { toWeeklyAvail } from "../utils/toWeeklyAvail.util";
-import type {AvailResponseDTO, CreateAvailRequestDTO, DayKey} from "@barber/shared/types";
+import type {CreateAvailRequestDTO, DayKey} from "@barber/shared/types";
 import { toast } from "sonner";
-import { AUTH_STORAGE_KEYS } from "@/core/auth/constants/auth.constants";
+import { ApiError } from "@barber/shared/errors";
+import { ErrorCode } from "@barber/shared/errors";
+import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 
 // ---------------------------------------------------------
 // 1. Hook para LEER (GET)
@@ -11,8 +13,9 @@ import { AUTH_STORAGE_KEYS } from "@/core/auth/constants/auth.constants";
 // Use suspense, quiere decir que si o si tiene que esperar a que cargue los datos
 
 // ---------------------------------------------------------
+
 export const useGetAvailability = () => {
-  const { data, refetch } = useSuspenseQuery({
+  const { data, refetch, isLoading, isError, error } = useSuspenseQuery({
     queryKey: ["availability"],
     queryFn: () => AvailService.getAvailByBarber(),
     staleTime: Infinity,
@@ -22,7 +25,7 @@ export const useGetAvailability = () => {
     refetchOnReconnect: true,
     select: (data) => {
       const weeklyAvail = toWeeklyAvail(data);
-      
+      //Devolverlos ordenados
       Object.values(weeklyAvail).forEach(dayData => {
           if (dayData?.intervals && dayData.intervals.length > 1){
             dayData.intervals.sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -33,7 +36,7 @@ export const useGetAvailability = () => {
     }
   });
 
-  return { availability: data, refetch };
+  return { availability: data ?? [], refetch, isLoading, isError, error };
 };
 
 // ---------------------------------------------------------
@@ -42,7 +45,7 @@ export const useGetAvailability = () => {
 export const useCreateAvailability = () => {
   const queryClient = useQueryClient();
 
-  const {mutate, mutateAsync, isPending, isSuccess, isError, error}  = useMutation({
+   return useMutation({
     // Retorno implícito
     mutationFn: (availData: CreateAvailRequestDTO) => AvailService.createAvail(availData),
     onSuccess: () => {
@@ -53,15 +56,6 @@ export const useCreateAvailability = () => {
       toast.error("Error al crear disponibilidad: " + error.message);
     },
   });
-
-  return {
-    createAvail: mutate,
-    createAvailAsync: mutateAsync,
-    isCreatingAvail: isPending, 
-    isSuccessCreatingAvail: isSuccess,
-    isErrorCreatingAvail: isError,
-    errorCreatingAvail: error,
-  };
 };
 
 // ---------------------------------------------------------
@@ -124,7 +118,7 @@ export const useDeleteByDay = () => {
 export const useAvail = () => {
   const { availability: schedule, refetch } = useGetAvailability();
   
-  const { createAvailAsync } = useCreateAvailability();
+  const { mutateAsync: createAvailAsync } = useCreateAvailability();
   const { mutate: deleteIntervalMutate } = useDeleteAvailability();
   const { mutate: deleteByDayMutate } = useDeleteByDay();
 
@@ -141,8 +135,8 @@ export const useAvail = () => {
             return { 
                 success: false, 
                 error: { 
-                  code: 'WORK_BLOCK_OVERLAP', 
-                  message: 'El horario se superpone con un bloque existente.' 
+                  code: ErrorCode.AVAIL_OVERLAP, 
+                  message: ERROR_MESSAGES[ErrorCode.AVAIL_OVERLAP] || 'El horario se superpone con un bloque existente.'
                 } 
             };
         }

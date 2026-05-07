@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
 import { BarbersService } from './barbers.service';
 import { CreateBarberDto } from './dto/create-barber.dto';
 import { UpdateBarberDto } from './dto/update-barber.dto';
-import { Barber } from './entities/barber.entity';
-import { BarberUser, User } from '@barber/shared/types';
+import { BarberUser } from '@barber/shared/types';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { UserRole } from '@barber/shared/types';
 
 @Controller('barbers')
 export class BarbersController {
@@ -20,17 +23,19 @@ export class BarbersController {
   }
 
   @Post('register')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async registerBarber(@Body() createBarberDto: CreateBarberDto): Promise<BarberUser> {
     return await this.barbersService.registerBarber(createBarberDto);
   }
   
   @Patch('update/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER, UserRole.ADMIN)
   async updateBarber(
     @Param('id') id: string,
     @Body() updateBarberDto: UpdateBarberDto
   ): Promise<BarberUser> {
     return await this.barbersService.updateBarber(id, updateBarberDto);
   }
-
-
 }

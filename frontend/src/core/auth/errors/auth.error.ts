@@ -1,12 +1,9 @@
-import { HttpError } from "@/shared/errors";
-import type { AuthErrorCode } from "../types";
+import { ApiError } from '@barber/shared/errors';
+import type { ErrorCode } from '@barber/shared/errors';
 
-export class AuthError extends HttpError {
-  public readonly code: AuthErrorCode;
-
-  constructor(status: number, code: AuthErrorCode, message?: string) {
-    super(status, message || code);
+export class AuthError extends ApiError {
+  constructor(code: ErrorCode, message?: string) {
+    super(code, message ?? code);
     this.name = 'AuthError';
-    this.code = code;
   }
 }

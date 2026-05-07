@@ -14,4 +14,5 @@ export type AvailResponseDTO = {
   barberId: string;  
   barbershopId: string;
   createdAt: string;
+  updatedAt: string;
 };

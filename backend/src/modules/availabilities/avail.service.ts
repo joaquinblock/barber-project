@@ -5,6 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Avail } from './entities/avail.entity';
 import { Repository, LessThan, MoreThan, Not } from 'typeorm';
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
+import { ErrorCode } from '@barber/shared/errors';
+import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
+import { AvailResponseDTO } from '@barber/shared';
+import { plainToInstance } from 'class-transformer';
+import { AvailResponseDto } from './dto/avail-response.dto';
 
 @Injectable()
 export class AvailService {
@@ -20,13 +25,14 @@ export class AvailService {
    * @param barber - Datos del barbero
    * @returns Promise<Avail> - Disponibilidad creada
    */
-  async create(createAvailDto: CreateAvailDto, barber: { barberId: string, barbershopId: string }): Promise<Avail> {
+  async createAvailByBarber(createAvailDto: CreateAvailDto, barberId: string, barbershopId: string ): Promise<AvailResponseDTO> {
     const { startTime, endTime, dayOfWeek } = createAvailDto;
 
     // Verificar si hay solapamiento: (nuevoStart < existenteEnd) AND (nuevoEnd > existenteStart)
     const overlapping = await this.availRepository.findOne({
       where: {
-        barberId: barber.barberId,
+        barberId,
+        barbershopId,
         dayOfWeek,
         startTime: LessThan(endTime),
         endTime: MoreThan(startTime),
@@ -34,15 +40,24 @@ export class AvailService {
     });
 
     if (overlapping) {
-      throw new ConflictException('El horario se solapa con uno existente');
+      throw new ConflictException({
+        code: ErrorCode.AVAIL_OVERLAP,
+        message: 'El horario se solapa con uno existente',
+      });
     }
 
     const newAvail = this.availRepository.create({
       ...createAvailDto,
-      barberId: barber.barberId,
-      barbershopId: barber.barbershopId,
+      barberId,
+      barbershopId,
     });
-    return this.availRepository.save(newAvail);
+    try {
+      const savedAvail = await this.availRepository.save(newAvail);
+      return plainToInstance(AvailResponseDto, savedAvail, { excludeExtraneousValues: true });
+    } catch (error) {
+      handleDbExceptions(error, 'availabilities');
+      throw error;
+    }
   }
 
   /**
@@ -54,10 +69,15 @@ export class AvailService {
    * @returns Promise<Avail[]> - Lista de disponibilidades
    * 
    */
-  async findByBarber(barberId: string): Promise<Avail[]> {
-    return this.availRepository.find({
-      where: { barberId },
+  async findAllAvailsByBarber(barberId: string, barbershopId: string): Promise<AvailResponseDTO[]> {
+    const avails = await this.availRepository.find({
+      where: { barberId, barbershopId },
+      order: {
+        dayOfWeek: 'ASC',
+        startTime: 'ASC',
+      },
     });
+    return plainToInstance(AvailResponseDto, avails, { excludeExtraneousValues: true });
   }
 
   /**
@@ -74,9 +94,12 @@ export class AvailService {
    * @throws NotFoundException - Si la disponibilidad no existe
    * @throws ConflictException - Si el horario se solapa con uno existente
    */
-  async update(id: string, updateAvailDto: UpdateAvailDto, barberId: string): Promise<Avail> {
-    const avail = await this.availRepository.findOne({ where: { id, barberId } });
-    if (!avail) throw new NotFoundException('Disponibilidad no encontrada');
+  async updateAvailByBarber(id: string, updateAvailDto: UpdateAvailDto, barberId: string, barbershopId: string ): Promise<AvailResponseDTO> {
+    const avail = await this.availRepository.findOne({ where: { id, barberId, barbershopId } });
+    if (!avail) throw new NotFoundException({
+      code: ErrorCode.AVAIL_NOT_FOUND,
+      message: 'Disponibilidad no encontrada',
+    });
 
     const startTime = updateAvailDto.startTime || avail.startTime;
     const endTime = updateAvailDto.endTime || avail.endTime;
@@ -86,20 +109,30 @@ export class AvailService {
     const overlapping = await this.availRepository.findOne({
       where: {
         barberId,
+        barbershopId,
         dayOfWeek,
         startTime: LessThan(endTime),
         endTime: MoreThan(startTime),
-        id: Not(id), //buscame problemas en cualquier lugar menos en este mismo registro, es por si queres cambiar la hora de entrada por una posterior o la de salida por una anterior
+        id: Not(id),
       },
     });
 
     if (overlapping) {
-      throw new ConflictException('El horario se solapa con uno existente');
+      throw new ConflictException({
+        code: ErrorCode.AVAIL_OVERLAP,
+        message: 'El horario se solapa con uno existente',
+      });
     }
     
     Object.assign(avail, updateAvailDto);
 
-    return this.availRepository.save(avail);
+    try {
+      const savedAvail = await this.availRepository.save(avail);
+      return plainToInstance(AvailResponseDto, savedAvail, { excludeExtraneousValues: true });
+    } catch (error) {
+      handleDbExceptions(error, 'availabilities');
+      throw error;
+    }
   }
 
   /**
@@ -109,10 +142,18 @@ export class AvailService {
    * @param barberId - ID del barbero
    * @throws NotFoundException - Si la disponibilidad no existe
    */
-  async remove(id: string, barberId: string) {
-    const avail = await this.availRepository.findOne({ where: { id, barberId } });
-    if (!avail) throw new NotFoundException('Disponibilidad no encontrada');
-    await this.availRepository.remove(avail);
+  async removeAvailByBarber(id: string, barberId: string, barbershopId: string ): Promise<void> {
+    const avail = await this.availRepository.findOne({ where: { id, barberId, barbershopId } });
+    if (!avail) throw new NotFoundException({
+      code: ErrorCode.AVAIL_NOT_FOUND,
+      message: 'Disponibilidad no encontrada',
+    });
+    try {
+      await this.availRepository.remove(avail);
+    } catch (error) {
+      handleDbExceptions(error, 'availabilities');
+      throw error;
+    }
   }
 
   /**
@@ -123,7 +164,12 @@ export class AvailService {
    * @param barberId - ID del barbero
    * @param dayOfWeek - Día de la semana
    */
-  async removeByDay(barberId: string, dayOfWeek: DayOfWeek) {
-    await this.availRepository.delete({ barberId, dayOfWeek });
+  async removeAvailsByDay(dayOfWeek: DayOfWeek, barberId: string, barbershopId: string): Promise<void> {
+    try {
+      await this.availRepository.delete({ dayOfWeek, barberId, barbershopId });
+    } catch (error) {
+      handleDbExceptions(error, 'availabilities');
+      throw error;
+    }
   }
 }

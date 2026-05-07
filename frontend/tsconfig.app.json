@@ -19,7 +19,9 @@
     /* RUTAS - El corazón de los alias */
     "paths": {
       "@/*": ["./src/*"],
-      "@barber/shared": ["../packages/shared/src/index.ts"]
+      "@barber/shared": ["../packages/shared/src/index.ts"],
+      "@barber/shared/types": ["../packages/shared/src/types/index.ts"],
+      "@barber/shared/errors": ["../packages/shared/src/errors/index.ts"]
     },
 
     /* Linting */

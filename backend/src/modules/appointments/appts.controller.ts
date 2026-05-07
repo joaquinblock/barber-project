@@ -3,14 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApptsService } from './appts.service';
 import { CreateApptBlockedDto } from './dto/create-appt-blocked.dto';
 import { CreateApptNormalDto } from './dto/create-appt-normal.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { UserRole } from '../users/enum/user-role.enum';
 
 @Controller('appointments')
 export class ApptsController {
@@ -35,6 +37,8 @@ export class ApptsController {
   }
 
   @Post('block')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER, UserRole.ADMIN)
   createBlock(@Body() createApptBlockedDto: CreateApptBlockedDto) {
     return {
       message: '¡Éxito! Esto bloquea un horario para un barbero específico',

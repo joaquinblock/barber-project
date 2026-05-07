@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/core/auth/context/auth.context';
-import { ROUTES_PATH } from '@/core/auth/constants/auth-routes.constants';
+import { ROUTES_PATH } from '@/core/auth/constants/auth.routes.constants';
 
 export const UnauthorizedPage = () => {
   const { user } = useAuth();

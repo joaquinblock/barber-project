@@ -1,4 +1,4 @@
-import { api } from "@/core/auth/utils/api.wrapper";
+import { api } from "@/core/api/utils/api.wrapper";
 import type { ExceptionDTO } from "@barber/shared/types";
 
 const EXCLUSION_ENDPOINT = "/exclusions";

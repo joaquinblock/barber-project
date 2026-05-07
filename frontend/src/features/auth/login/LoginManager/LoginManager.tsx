@@ -7,10 +7,12 @@ import { Suspense, useState } from "react";
 import { useAuth } from "@/core/auth/context/auth.context";
 import { useParams } from "react-router-dom";
 import { FeatureErrorBoundary } from "@/shared/components/ui";
-import { AuthError } from "@/core/auth/errors/auth.error";
+import { ApiError, HttpError } from "@barber/shared/errors";
+import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
+import { ErrorCode } from "@barber/shared/errors";
 
 const LoginManagerContent = () => {
-  const { login, isLoading } = useAuth(); // Obtenemos el método de login y el error del contexto
+  const { login, isLoading } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const [error, setError] = useState<string | null>(null);
   
@@ -27,13 +29,17 @@ const LoginManagerContent = () => {
     try {
       await login(credentials, slug);
     } catch (e) {
-       if(e instanceof AuthError) {
-        console.log(e.message);
-        setError(e.message);
-       }else{
-        console.log(e);
-        setError("Ocurrió un error inesperado, intenta más tarde.");
-       }
+      let msg = '';
+      if (e instanceof ApiError) {
+        // Error de lógica: el backend contestó con un code semántico
+        msg = ERROR_MESSAGES[e.code as ErrorCode] ?? e.message;
+      } else if (e instanceof HttpError) {
+        // Error de infraestructura: sin internet, servidor caído
+        msg = ERROR_MESSAGES[ErrorCode.SERVER_ERROR] ?? e.message;
+      } else {
+        msg = ERROR_MESSAGES[ErrorCode.UNKNOWN_ERROR] ?? 'Ocurrió un error inesperado.';
+      }
+      setError(msg);
     }
   }
 

@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth.context";
 import type { UserRole } from "@barber/shared/types";
-import { ROUTES_PATH } from "../constants/auth-routes.constants";
+import { ROUTES_PATH } from "../constants/auth.routes.constants";
 
 type ProtectedRouteProps = {
   allowedRoles?: UserRole[]; 

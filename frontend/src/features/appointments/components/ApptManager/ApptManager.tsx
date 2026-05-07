@@ -1,6 +1,6 @@
 import { Suspense, useState } from "react";
 import { formatDateToKey } from "@/shared/utils/time-utils";
-import type { ApptErrorCode, BanFormData } from "@/features/appointments/types";
+import type { BanFormData } from "@/features/appointments/types";
 import {
   ApptList,
   ApptWorkBlock,
@@ -10,7 +10,8 @@ import { Button, Calendar, Title, FeatureErrorBoundary } from "@/shared/componen
 import { Ban, Briefcase } from "lucide-react";
 import { formatDateToDisplay } from "@/shared/utils/time-utils";
 import { useAppointments } from "../../hooks/useAppt";
-import { APPT_ERROR_MESSAGES } from "../../constants/error";
+import { ErrorCode } from "@barber/shared/errors";
+import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 import { formatDateToDayKey } from "@/shared/utils/time-utils";
 import type { DateKey, PublicAvailabilityState } from "@barber/shared/types";
 import styles from "./appt-manager.module.css";
@@ -56,8 +57,8 @@ const ApptManagerContent = ({ appt, availability }: ApptManagerProps) => {
 
     // 2. Si falló, armamos el mensaje antes de salir
     if (!result.success && result.error) {
-      const code = result.error.code as ApptErrorCode;
-      const baseMsg = APPT_ERROR_MESSAGES[code] || "Error inesperado";
+      const code = result.error.code as ErrorCode;
+      const baseMsg = ERROR_MESSAGES[code] || "Error inesperado";
       const detail = result.error.message;
 
       setErrorMsg(`${baseMsg} ${detail ? `(${detail})` : ""}`);

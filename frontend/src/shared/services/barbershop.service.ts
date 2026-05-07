@@ -1,5 +1,5 @@
 import type { BarbershopDTO } from "@barber/shared/types";
-import { api } from "@/core/auth/utils/api.wrapper";
+import { api } from "@/core/api/utils/api.wrapper";
 
 export const barbershopService = {
   getBySlug: async (slug: string): Promise<BarbershopDTO> => {

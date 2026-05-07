@@ -7,6 +7,8 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity('offers')
@@ -18,8 +20,8 @@ export class Offer {
   @Column({ type: 'varchar', length: 100 })
   title!: string;
 
-  @Column({ type: 'text', nullable: true })
-  description?: string;
+  @Column({ type: 'text', nullable: true, default: null })
+  description!: string | null;
 
   @Column({
     type: 'decimal',
@@ -43,6 +45,12 @@ export class Offer {
 
   @Column({ name: 'is_active', default: true })
   isActive!: boolean; // Vital para "borrar" ofertas sin romper turnos viejos
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  updatedAt!: Date;
 
   @Index() // Índice para acelerar consultas por barberId
   @Column({ type: 'uuid', name: 'barber_id' })

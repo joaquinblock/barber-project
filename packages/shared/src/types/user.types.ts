@@ -1,7 +1,13 @@
 import type { Barber } from './barber.types';
 import type { Customer } from './customer.types';
 
-export type UserRole = 'ADMIN' | 'BARBER' | 'CUSTOMER';
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  BARBER: 'BARBER',
+  CUSTOMER: 'CUSTOMER',
+} as const;
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export type BaseUser = {
   id: string;
