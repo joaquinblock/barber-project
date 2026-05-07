@@ -27,8 +27,6 @@ describe('CreateAvailDto', () => {
       dayOfWeek: DayOfWeek.TUE,
       startTime: '09:00',
       endTime: '13:00',
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001',
     };
     const errors = await validateDto(dto);
     expect(errors.length).toBe(0);
@@ -39,8 +37,6 @@ describe('CreateAvailDto', () => {
       dayOfWeek: DayOfWeek.MON,
       startTime: '25:00', // Inválido
       endTime: '12:00',
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001',
     };
     const errors = await validateDto(dto);
     expect(errors.some((e) => e.property === 'startTime')).toBe(true);
@@ -51,8 +47,6 @@ describe('CreateAvailDto', () => {
       dayOfWeek: DayOfWeek.WED,
       startTime: '18:00',
       endTime: '09:00', // Error lógico
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001',
     };
     const errors = await validateDto(dto);
     const intervalError = findError(errors, 'endTime');
@@ -64,8 +58,6 @@ describe('CreateAvailDto', () => {
       dayOfWeek: 'LUNES', // Inválido, debe ser MON
       startTime: '09:00',
       endTime: '12:00',
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001',
     };
     const errors = await validateDto(dto as any);
     expect(errors.some((e) => e.property === 'dayOfWeek')).toBe(true);

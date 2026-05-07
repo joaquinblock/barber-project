@@ -3,15 +3,18 @@ import type { Exception } from "@barber/shared/types";
 import { Calendar, Plus } from "lucide-react";
 import styles from "./excl-manager.module.css";
 import { Suspense, useState } from "react";
-import { ExclCard, ExclModal } from "@/features/exclusions/components";
-import { useExcl } from "@/features/exclusions/hooks/useExcl";
+import { ExclCard, ExclModal } from "@/features/exceptions/components";
+import { useExcl } from "@/features/exceptions/hooks/useExcl";
 
 type ExclManagerProps = {
-  exclusions: ReturnType<typeof useExcl>;
+   barbershopId: string;
+   barberId: string;
 };
 
-const ExclManagerContent = ({ exclusions }: ExclManagerProps) => {
-  const { exceptions, addException, deleteException } = exclusions;
+const ExclManagerContent = ({ barbershopId, barberId }: ExclManagerProps) => {
+
+  const { data: exceptions, addException, deleteException } = useExcl(barbershopId, barberId);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddException = (newException: Exception) => {

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { LoginCredentials } from "../types";
 import { AuthService } from "../services/auth.service";
 import type { User, UserRole } from "@barber/shared/types";
+import { AUTH_STORAGE_KEYS } from "../constants/auth.constants";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -31,13 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   } = useQuery({
     queryKey: ['auth', 'session'],
     queryFn: async () => {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN);
       if (!token) return null;
       
       try {
         return await AuthService.getProfile(token);
       } catch (error) {
-        localStorage.removeItem("auth_token");
+        localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
         return null;
       }
     },
@@ -49,9 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     mutationFn: ({ credentials, slug }: { credentials: LoginCredentials; slug: string }) => 
       AuthService.login(credentials, slug),
     onSuccess: (data) => {
-      localStorage.setItem("auth_token", data.token);
-      localStorage.setItem("auth_user", JSON.stringify(data.user));
-      localStorage.setItem("auth_barbershop_id", data.barbershopId);
+      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, data.token);
+      localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(data.user));
+      localStorage.setItem(AUTH_STORAGE_KEYS.BARBERSHOP_ID, data.barbershopId);
       
       // Actualizamos el cache de la sesión
       queryClient.setQueryData(['auth', 'session'], {
@@ -66,9 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_barbershop_id");
+    localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.USER);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.BARBERSHOP_ID);
     queryClient.setQueryData(['auth', 'session'], null);
     queryClient.removeQueries({ queryKey: ['auth'] });
   };

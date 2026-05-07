@@ -18,6 +18,7 @@ export const AvailTimeRange = ({ items, onClickAddBlock, onDelete }: AvailTimeRa
                 emptyComponent={null}
                 renderItem={(item) => (
                     <AvailWorkBlock
+                        key={item.id}
                         startTime={item.startTime}
                         endTime={item.endTime}
                         isEditable={false}

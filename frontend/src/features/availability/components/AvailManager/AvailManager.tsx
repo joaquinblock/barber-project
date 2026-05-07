@@ -1,4 +1,4 @@
-import { AVAIL_ERROR_MESSAGES } from "../../constants/error";
+import { AVAIL_ERROR_MESSAGES } from "../../errors/avail.error.messages";
 import { Clock } from "lucide-react";
 import { useState } from "react";
 import styles from "./avail-manager.module.css";
@@ -6,6 +6,7 @@ import type { AvailErrorCode } from "../../types";
 import type { DayKey, TimeRangeRequest} from "@barber/shared/types";
 import { DAYS_CONFIG } from "@/shared/constants/days";
 import { Suspense } from "react";
+import { toast } from "sonner";
 
 import {
   AvailDaySelector,
@@ -14,18 +15,14 @@ import {
   AvailAddBlockModal,
 } from "@/features/availability/components";
 import { EmptyState, Title } from "@/shared/components/ui";
+import { FeatureErrorBoundary } from "@/shared/components/ui";
 import { useAvail } from "../../hooks/useAvail";
 
-import { FeatureErrorBoundary } from "@/shared/components/ui";
 
-type AvailManagerProps = {
-  barberId: string 
-  barbershopId: string
-};
 
-const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
+const AvailManagerContent = () => {
   
-  const { schedule, addInterval, deleteInterval, toggleWorkingStatus } = useAvail(barberId, barbershopId);
+  const { schedule, addInterval, deleteInterval, toggleWorkingStatus } = useAvail();
 
   if (!schedule) return null;
 
@@ -53,12 +50,16 @@ const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
     }
   };
 
-  const handleToggle = (val: boolean) => {
+  const handleToggle = async (val: boolean) => {
+    console.log(val);
     //Tenemos que llamar primero porque sino no cambia el estado del switch
     //En handleCloseModal hacemos la validación de si el user prendió el switch pero no cargó nada, lo apagamos de nuevo.
-    toggleWorkingStatus(daySelected, val);
+    await toggleWorkingStatus(daySelected, val);
+
+    schedule[daySelected].isWorking = val;
 
     const dayData = schedule[daySelected];
+
     if (val && dayData.isWorking && (dayData.intervals?.length ?? 0) === 0) {
       handleOpenModalAddBlock(); // 2. Si falta data, pedila
     }
@@ -72,7 +73,11 @@ const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
     // 1. Limpiamos el rastro de errores viejos
     setErrorAddBlock(null);
 
-    const result = await addInterval(daySelected, timeRange);
+    const result = await addInterval({
+      dayOfWeek: daySelected,
+      startTime: timeRange.startTime,
+      endTime: timeRange.endTime,
+    });
 
     if (result.success) {
       handleCloseModal(daySelected, true);
@@ -85,6 +90,36 @@ const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
         "Error desconocido";
       setErrorAddBlock(message);
       return false;
+    }
+  };
+
+  const handleCopy = async (fromDay: DayKey) => {
+    const fromDayData = schedule[fromDay];
+    if (!fromDayData || !fromDayData.isWorking) return;
+
+    setIsModalOpen(false); // Cerramos el modal inmediatamente
+    const toastId = toast.loading(`Copiando horarios desde ${DAYS_CONFIG[fromDay].full}...`);
+
+    try {
+      // Replicar cada intervalo del día origen al día destino
+      const promises = fromDayData.intervals.map(interval => 
+        addInterval({
+          dayOfWeek: daySelected,
+          startTime: interval.startTime,
+          endTime: interval.endTime,
+        })
+      );
+
+      const results = await Promise.all(promises);
+      
+      const hasErrors = results.some(r => !r.success);
+      if (hasErrors) {
+        toast.error("Algunos horarios no se pudieron copiar por solapamiento o error", { id: toastId });
+      } else {
+        toast.success(`Horarios copiados correctamente desde ${DAYS_CONFIG[fromDay].full}`, { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Error al copiar horarios", { id: toastId });
     }
   };
 
@@ -121,6 +156,9 @@ const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
             onClose={() => handleCloseModal(daySelected)}
             // Al confirmar, si sale bien, avisamos que es un ÉXITO
             onConfirm={handleConfirmAdd}
+            onCopy={handleCopy}
+            schedule={schedule}
+            currentDay={daySelected}
             errorMessage={errorAddBlock}
           />
         )}
@@ -129,10 +167,10 @@ const AvailManagerContent = ({ barberId, barbershopId }: AvailManagerProps) => {
   );
 };
 
-export const AvailManager = (props: AvailManagerProps) => (
+export const AvailManager = () => (
   <FeatureErrorBoundary featureName="Availability">
     <Suspense fallback={<div>Loading...</div>}>
-      <AvailManagerContent {...props} />
+      <AvailManagerContent />
     </Suspense>
   </FeatureErrorBoundary>
 );

@@ -1,13 +1,17 @@
 import type { DayKey } from "./time.types";
 
-export type AvailabilityDTO = {
+export type CreateAvailRequestDTO = {
   dayOfWeek: DayKey;
   startTime: string;
   endTime: string;
-  barberId: string;
-  barbershopId: string;
 };
 
-export type AvailabilityResponseDTO = AvailabilityDTO & {
+export type AvailResponseDTO = {
   id: string;
+  dayOfWeek: DayKey;
+  startTime: string;
+  endTime: string;
+  barberId: string;  
+  barbershopId: string;
+  createdAt: string;
 };

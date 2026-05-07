@@ -3,7 +3,8 @@ import { AuthProvider, useAuth } from '@/core/auth/context/auth.context';
 import { AuthService } from '../services/auth.service';
 import { beforeEach, vi } from 'vitest';
 import { expect, describe, it } from 'vitest';
-import type { User } from '../types';
+import type { User } from '@barber/shared/types';
+import { AUTH_STORAGE_KEYS } from '../constants/auth.constants';
 
 // ---- Mocks ----
 vi.mock('../services/auth.service');
@@ -47,9 +48,9 @@ describe('AuthProvider', () => {
 
   it('rehidrata el estado desde localStorage', async () => {
     // Simulamos que ya había una sesión guardada
-    localStorage.setItem('auth_user', JSON.stringify(mockUser));
-    localStorage.setItem('auth_token', 'fake-jwt-token');
-    localStorage.setItem('auth_barbershop_id', 'shop-456');
+    localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(mockUser));
+    localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, 'fake-jwt-token');
+    localStorage.setItem(AUTH_STORAGE_KEYS.BARBERSHOP_ID, 'shop-456');
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -97,9 +98,9 @@ describe('login', () => {
       );
     });
 
-    expect(localStorage.getItem('auth_token')).toBe('fake-jwt-token');
-    expect(localStorage.getItem('auth_barbershop_id')).toBe('shop-456');
-    expect(JSON.parse(localStorage.getItem('auth_user')!)).toEqual(mockUser);
+    expect(localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN)).toBe('fake-jwt-token');
+    expect(localStorage.getItem(AUTH_STORAGE_KEYS.BARBERSHOP_ID)).toBe('shop-456');
+    expect(JSON.parse(localStorage.getItem(AUTH_STORAGE_KEYS.USER)!)).toEqual(mockUser);
   });
 
   it('limpia el estado si el login falla', async () => {

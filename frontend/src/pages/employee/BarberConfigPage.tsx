@@ -1,8 +1,8 @@
 import { AvailManager } from "@/features/availability";
-import { Button} from "@/shared/components/ui";
+import { Button } from "@/shared/components/ui";
 import { useAuth } from "@/core/auth/context/auth.context";
-// import { ExclManager } from "@/features/exclusions/components";
-// import { OfferManager } from "@/features/offers";
+/*import { ExclManager } from "@/features/exceptions/components";
+import { OfferManager } from "@/features/offers";*/
 
 export const BarberConfigPage = () => {
 
@@ -21,9 +21,9 @@ export const BarberConfigPage = () => {
         <p>Hola <b>{user?.fullName}</b></p>
         <p>Bienvenido a la barberia <b>{barberId}</b></p>
       </div>
-      <AvailManager barberId={barberId} barbershopId={barbershopId}/>
-      {/* <ExclManager exclusions={config.exceptions}/>
-      <OfferManager offers={config.offers}/> */}
+      <AvailManager/>
+      {/*<ExclManager exclusions={config.exceptions}/>*/}
+      {/*<OfferManager offers={config.offers}/>*/}
       <div className="div">
         <Button variant="danger" onClick={logout}>Cerrar sesión</Button>
       </div>

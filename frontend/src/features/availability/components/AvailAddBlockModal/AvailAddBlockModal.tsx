@@ -2,23 +2,39 @@ import { Modal, Button, Input } from "@/shared/components/ui";
 import { useState } from "react";
 import { Alert } from "@/shared/components/ui";
 import { CircleAlert } from "lucide-react";
-import type { HourString, TimeRangeRequest } from "@barber/shared/types";
+import type { DayKey, HourString, TimeRangeRequest } from "@barber/shared/types";
+import type { WeeklyAvailability } from "../../types";
+import { DAYS_CONFIG } from "@/shared/constants/days";
+import styles from "./avail-add-block-modal.module.css";
 
 type AvailAddBlockModalProps = {
   onClose: () => void;
   onConfirm: (timeRange: TimeRangeRequest) => Promise<boolean> | boolean;
+  onCopy?: (fromDay: DayKey) => void;
+  schedule?: WeeklyAvailability;
+  currentDay?: DayKey;
   errorMessage?: string | null;
 };
 
 export const AvailAddBlockModal = ({
   onClose,
   onConfirm,
+  onCopy,
+  schedule,
+  currentDay,
   errorMessage,
 }: AvailAddBlockModalProps) => {
   const [localBlock, setLocalBlock] = useState<TimeRangeRequest>({
     startTime: "00:00" as HourString,
     endTime: "00:00" as HourString,
   });
+
+  // Filtrar días que tienen horarios cargados y no es el día actual
+  const copyableDays = schedule 
+    ? (Object.keys(schedule) as DayKey[]).filter(day => 
+        day !== currentDay && schedule[day].isWorking && schedule[day].intervals.length > 0
+      )
+    : [];
 
   const handleConfirm = async () => {
     // onConfirm en el padre ya se encarga de cerrar si es exitoso
@@ -27,6 +43,25 @@ export const AvailAddBlockModal = ({
 
   return (
     <Modal text="Agregar bloque de trabajo" onClose={onClose}>
+      {copyableDays.length > 0 && (
+        <div className={styles.copyContainer}>
+          <p className={styles.copyLabel}>Copiar horarios desde:</p>
+          <div className={styles.copyButtons}>
+            {copyableDays.map(day => (
+              <button 
+                key={day} 
+                className={styles.copyButton}
+                onClick={() => onCopy && onCopy(day)}
+                type="button"
+              >
+                {DAYS_CONFIG[day].letter}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className={styles.formContainer}>
       <Input
         type="time" //el browser ya se encarga de validar el formato, no necesito regex ni nada
         variant="inline"
@@ -53,6 +88,7 @@ export const AvailAddBlockModal = ({
       >
         Confirmar
       </Button>
+      </div>
     </Modal>
   );
 };

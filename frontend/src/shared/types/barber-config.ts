@@ -1,5 +1,5 @@
 import type { WeeklyAvailability } from '@/features/availability/types';
-import type { Exception } from '@/features/exclusions/types';
+import type { Exception } from '@/features/exceptions/types';
 import type { Offers } from '@/features/offers/types';
 
 

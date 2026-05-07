@@ -20,4 +20,11 @@ export const SOCIAL_PROVIDERS: SocialProviderConfig[] = [
 export const LOGIN_UI_TEXT = {
   title: "Focus Barber Studio",
   subtitle: "Reservá tu corte en segundos"
-}
+};
+
+export const AUTH_STORAGE_KEYS = {
+  TOKEN: 'auth_token',
+  BARBERSHOP_ID: 'auth_barbershop_id',
+  USER_ID: 'auth_user_id',
+  USER: 'auth_user',
+} as const;

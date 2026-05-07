@@ -1,238 +1,177 @@
-import { AVAIL_ERROR_MESSAGES } from "../constants/error";
-import type { OperationResult } from "@/shared/types";
-import { useState, useEffect } from "react";
-import { findConflict, validateBasicTimeRange } from "@/shared/utils/time-utils";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { AvailService } from "../services/avail.service";
-import type { AvailErrorCode } from "../types";
-import type { WeeklyAvailability } from "../types";
-import type { AvailabilityDTO, AvailabilityResponseDTO, DayKey, TimeRangeRequest, TimeRangeResponse } from "@barber/shared/types";
+import { toWeeklyAvail } from "../utils/toWeeklyAvail.util";
+import type {AvailResponseDTO, CreateAvailRequestDTO, DayKey} from "@barber/shared/types";
+import { toast } from "sonner";
+import { AUTH_STORAGE_KEYS } from "@/core/auth/constants/auth.constants";
 
-export const useAvail = (barberId: string, barbershopId: string) => {
-  const [schedule, setSchedule] = useState<WeeklyAvailability | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false); 
-  const [error, setError] = useState<AvailErrorCode | null>(null); 
+// ---------------------------------------------------------
+// 1. Hook para LEER (GET)
+// 
+// Use suspense, quiere decir que si o si tiene que esperar a que cargue los datos
 
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      setIsLoading(true);
-      setError(null);
-      const result = await AvailService.getByBarber(barberId, barbershopId);
-
-      if (result.success) {
-        const items = result.data;
-        const availabilitiesMap: WeeklyAvailability = {
-          MON: { dayKey: "MON", isWorking: false },
-          TUE: { dayKey: "TUE", isWorking: false },
-          WED: { dayKey: "WED", isWorking: false },
-          THU: { dayKey: "THU", isWorking: false },
-          FRI: { dayKey: "FRI", isWorking: false },
-          SAT: { dayKey: "SAT", isWorking: false },
-          SUN: { dayKey: "SUN", isWorking: false },
-        };
-
-        items.forEach((item: AvailabilityResponseDTO) => {
-          const dayKey = item.dayOfWeek as keyof WeeklyAvailability;
-          if (!(dayKey in availabilitiesMap)) {
-            console.warn(`Día desconocido: ${dayKey}`);
-            return;
+// ---------------------------------------------------------
+export const useGetAvailability = () => {
+  const { data, refetch } = useSuspenseQuery({
+    queryKey: ["availability"],
+    queryFn: () => AvailService.getAvailByBarber(),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: 2,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    select: (data) => {
+      const weeklyAvail = toWeeklyAvail(data);
+      
+      Object.values(weeklyAvail).forEach(dayData => {
+          if (dayData?.intervals && dayData.intervals.length > 1){
+            dayData.intervals.sort((a, b) => a.startTime.localeCompare(b.startTime));
           }
+      });
 
-          const dayConfig = availabilitiesMap[dayKey];
-          if (!dayConfig.isWorking) {
-            availabilitiesMap[dayKey] = {
-              dayKey: dayKey,
-              isWorking: true,
-              intervals: [{ 
-                id: item.id, 
-                startTime: item.startTime as any, 
-                endTime: item.endTime as any 
-              }],
-            };
-          } else {
-            dayConfig.intervals.push({ 
-              id: item.id, 
-              startTime: item.startTime as any, 
-              endTime: item.endTime as any 
-            });
-          }
+      return weeklyAvail
+    }
+  });
+
+  return { availability: data, refetch };
+};
+
+// ---------------------------------------------------------
+// 2. Hook para CREAR (POST)
+// ---------------------------------------------------------
+export const useCreateAvailability = () => {
+  const queryClient = useQueryClient();
+
+  const {mutate, mutateAsync, isPending, isSuccess, isError, error}  = useMutation({
+    // Retorno implícito
+    mutationFn: (availData: CreateAvailRequestDTO) => AvailService.createAvail(availData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Disponibilidad creada correctamente");
+    },
+    onError: (error) => {
+      toast.error("Error al crear disponibilidad: " + error.message);
+    },
+  });
+
+  return {
+    createAvail: mutate,
+    createAvailAsync: mutateAsync,
+    isCreatingAvail: isPending, 
+    isSuccessCreatingAvail: isSuccess,
+    isErrorCreatingAvail: isError,
+    errorCreatingAvail: error,
+  };
+};
+
+// ---------------------------------------------------------
+// 3. Hook para ACTUALIZAR (PUT)
+// ---------------------------------------------------------
+export const useUpdateAvailability = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({idAvail, updateAvailDto}: {idAvail: string, updateAvailDto: Partial<CreateAvailRequestDTO>}) => AvailService.updateAvail(idAvail, updateAvailDto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Disponibilidad actualizada correctamente");
+    },
+    onError: (error) => {
+      toast.error("Error al actualizar disponibilidad: " + error.message);
+    },
+  });
+};
+
+// ---------------------------------------------------------
+// 4. Hook para BORRAR (DELETE)
+// ---------------------------------------------------------
+export const useDeleteAvailability = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (idAvail: string) => AvailService.deleteAvail(idAvail),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Disponibilidad eliminada correctamente");
+    },
+    onError: (error) => {
+      toast.error("Error al eliminar disponibilidad: " + error.message);
+    },
+  });
+};
+
+// ------ ---------------------------------------------------
+// 5. Hook para BORRAR POR DIA COMPLETO(DELETE)
+// (Este se usa para cuando queres poner que no trabajas un dia y tenes varios horarios)
+// ---------------------------------------------------------
+export const useDeleteByDay = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (day: string) => await AvailService.deleteByDay(day),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      toast.success("Disponibilidad eliminada correctamente");
+    },
+    onError: (error) => {
+      toast.error("Error al eliminar disponibilidad: " + error.message);
+    },
+  });
+};
+// ---------------------------------------------------------
+// 6. Hook COMPUESTO para el componente AvailManager (Mantiene compatibilidad)
+// ---------------------------------------------------------
+export const useAvail = () => {
+  const { availability: schedule, refetch } = useGetAvailability();
+  
+  const { createAvailAsync } = useCreateAvailability();
+  const { mutate: deleteIntervalMutate } = useDeleteAvailability();
+  const { mutate: deleteByDayMutate } = useDeleteByDay();
+
+  const addInterval = async (data: CreateAvailRequestDTO) => {
+    // 1. Validar solapamiento localmente para UX
+    const dayAvail = schedule?.[data.dayOfWeek as DayKey];
+    if (dayAvail && dayAvail.isWorking) {
+        const hasOverlap = dayAvail.intervals.some(interval => {
+            // Condición de solapamiento: (start1 < end2) AND (end1 > start2)
+            return data.startTime < interval.endTime && data.endTime > interval.startTime;
         });
 
-        setSchedule(availabilitiesMap);
-      } else {
-        setError(result.error.code as AvailErrorCode);
-      }
-      setIsLoading(false);
-    };
-
-    fetchSchedule();
-  }, [barberId, barbershopId]);
-
-  const addInterval = async (
-    day: DayKey,
-    range: TimeRangeRequest,
-  ): Promise<OperationResult<TimeRangeResponse, AvailErrorCode>> => {
-
-    // Guard de schedule no cargado
-    if (!schedule) {
-      return {
-        success: false,
-        error: { code: "SERVER_ERROR", message: "Schedule no cargado" },
-      };
+        if (hasOverlap) {
+            return { 
+                success: false, 
+                error: { 
+                  code: 'WORK_BLOCK_OVERLAP', 
+                  message: 'El horario se superpone con un bloque existente.' 
+                } 
+            };
+        }
     }
 
-    // Validación local primero — barata, no requiere red
-    const validationError = validateBasicTimeRange(range);
-    if (validationError) {
-      return {
-        success: false,
-        error: { code: validationError, message: AVAIL_ERROR_MESSAGES[validationError] },
-      };
+    try {
+      await createAvailAsync(data);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error };
     }
-
-    const dayData = schedule[day];
-    const currentIntervals = dayData.isWorking ? dayData.intervals : [];
-
-    const conflict = findConflict(range, currentIntervals);
-    if (conflict) {
-      return {
-        success: false,
-        error: { code: "WORK_BLOCK_OVERLAP", message: AVAIL_ERROR_MESSAGES.WORK_BLOCK_OVERLAP },
-      };
-    }
-
-    setIsSaving(true);
-    const result = await AvailService.create({
-      dayOfWeek: day,
-      startTime: range.startTime,
-      endTime: range.endTime,
-      barberId,
-      barbershopId,
-    } as AvailabilityDTO);
-    setIsSaving(false);
-
-    if (!result.success) {
-      return {
-        success: false,
-        error: { code: result.error.code as AvailErrorCode, message: result.error.message },
-      };
-    }
-
-    const createdInterval = result.data;
-
-    setSchedule((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        [day]: {
-          dayKey: day,
-          isWorking: true,
-          intervals: [...currentIntervals, { id: createdInterval.id, startTime: createdInterval.startTime as any, endTime: createdInterval.endTime as any }],
-        },
-      };
-    });
-
-    return { success: true, data: { id: createdInterval.id, startTime: createdInterval.startTime as any, endTime: createdInterval.endTime as any } as TimeRangeResponse };
   };
 
-  const deleteInterval = async (
-    day: DayKey,
-    rangeId: string,
-  ): Promise<OperationResult<void, AvailErrorCode>> => {
-    if (!schedule) {
-      return {
-        success: false,
-        error: { code: "SERVER_ERROR", message: "Schedule no cargado" },
-      };
-    }
-
-    const dayData = schedule[day];
-    const currentIntervals = dayData.isWorking ? dayData.intervals : [];
-
-    setIsSaving(true);
-    const result = await AvailService.delete(rangeId);
-    setIsSaving(false);
-
-    if (!result.success) {
-      return {
-        success: false,
-        error: { code: result.error.code as AvailErrorCode, message: result.error.message },
-      };
-    }
-
-    setSchedule((prev) => {
-      if (!prev) return prev;
-      const remainingIntervals = currentIntervals.filter((interval) => interval.id !== rangeId);
-      
-      if (remainingIntervals.length === 0) {
-        return {
-          ...prev,
-          [day]: { dayKey: day, isWorking: false },
-        };
-      }
-
-      return {
-        ...prev,
-        [day]: {
-          dayKey: day,
-          isWorking: true,
-          intervals: remainingIntervals as [TimeRangeResponse, ...TimeRangeResponse[]],
-        },
-      };
-    });
-
-    return { success: true, data: undefined };
+  const deleteInterval = (day: DayKey, id: string) => {
+    deleteIntervalMutate(id);
   };
 
-  const toggleWorkingStatus = async (
-    day: DayKey,
-    isWorking: boolean,
-  ): Promise<OperationResult<void, AvailErrorCode>> => {
-    if (!schedule) return { success: false, error: { code: "SERVER_ERROR", message: "Schedule no cargado" } };
-
+  const toggleWorkingStatus = (day: DayKey, isWorking: boolean): Promise<void> => {
     if (!isWorking) {
-      // Si apagamos, borramos todo en el backend
-      setIsSaving(true);
-      const result = await AvailService.deleteByDay(barberId, day);
-      setIsSaving(false);
-
-      if (!result.success) {
-        return { success: false, error: { code: result.error.code as AvailErrorCode, message: result.error.message } };
-      }
-
-      setSchedule((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          [day]: { dayKey: day, isWorking: false },
-        };
-      });
-    } else {
-      // Si prendemos, solo actualizamos el estado local para permitir agregar intervalos
-      // No tocamos el backend todavía, el backend se toca al hacer 'create' del primer intervalo
-      setSchedule((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          [day]: { 
-            dayKey: day, 
-            isWorking: true, 
-            intervals: [] as any // Temporalmente vacío hasta que el usuario agregue uno
-          },
-        };
-      });
-    }
-
-    return { success: true, data: undefined };
+      deleteByDayMutate(day);
+    } 
+    return Promise.resolve();
   };
 
   return {
     schedule,
-    isLoading,
-    isSaving, // el componente puede deshabilitar el botón mientras guarda
-    error,
+    refetch,
     addInterval,
     deleteInterval,
-    toggleWorkingStatus,
+    toggleWorkingStatus
   };
 };
