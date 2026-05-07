@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { BarbershopService } from '../barbershop/barbershop.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDTO, User as SharedUser } from '@barber/shared/types';
-import { UserRole } from '@/modules/users/enum/user-role.enum';
+import { UserRole } from '@barber/shared/types';
 import { plainToInstance } from 'class-transformer';
 import { BarberUserDto } from '../barbers/dto/barber-user.dto';
 import { CustomerUserDto } from '../customers/dto/customer-user.dto';

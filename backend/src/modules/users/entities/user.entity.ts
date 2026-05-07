@@ -5,7 +5,7 @@ import {
   OneToOne, 
   PrimaryGeneratedColumn 
 } from 'typeorm';
-import { UserRole } from '../enum/user-role.enum';
+import { UserRole } from '@barber/shared/types';
 import { Customer } from '@/modules/customers/entities/customer.entity';
 import { Exclude } from 'class-transformer';
 

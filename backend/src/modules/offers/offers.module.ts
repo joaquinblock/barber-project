@@ -4,8 +4,10 @@ import { OffersController } from './offers.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Offer } from './entities/offer.entity';
 
+import { AuthModule } from '../auth/auth.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Offer])], // Aquí puedes agregar tus entidades de oferta si las tienes
+  imports: [TypeOrmModule.forFeature([Offer]), AuthModule],
   controllers: [OffersController],
   providers: [OffersService],
 })

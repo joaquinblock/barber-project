@@ -60,13 +60,21 @@ export const useUpdateOffer = () => {
         },
         onError: (error) => {
             if (error instanceof ApiError) {
-                if (error.code === ErrorCode.OFFER_NOT_FOUND){
-                    toast.error(ERROR_MESSAGES[ErrorCode.OFFER_NOT_FOUND]);
-                } 
+                switch (error.code) {
+                    case ErrorCode.OFFER_NOT_FOUND:
+                        toast.error(ERROR_MESSAGES[ErrorCode.OFFER_NOT_FOUND]);
+                        break;
+                    case ErrorCode.OFFER_OVERLAP:
+                        toast.error(ERROR_MESSAGES[ErrorCode.OFFER_OVERLAP]);
+                        break;
+                    default:
+                        toast.error(ERROR_MESSAGES[ErrorCode.SERVER_ERROR]);
+                }
             } else {
                 toast.error(ERROR_MESSAGES[ErrorCode.SERVER_ERROR]);
             }
         },
+
     });
 
     return mutation;

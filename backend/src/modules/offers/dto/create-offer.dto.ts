@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, MaxLength, IsInt, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, MaxLength, IsInt } from 'class-validator';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
 import { CreateOfferDTO } from '@barber/shared/types';
 

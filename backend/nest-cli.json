@@ -3,7 +3,7 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
+    "builder": "webpack",
     "deleteOutDir": true
   }
 }

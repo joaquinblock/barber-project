@@ -3,7 +3,6 @@ import { AvailService } from "../services/avail.service";
 import { toWeeklyAvail } from "../utils/toWeeklyAvail.util";
 import type {CreateAvailRequestDTO, DayKey} from "@barber/shared/types";
 import { toast } from "sonner";
-import { ApiError } from "@barber/shared/errors";
 import { ErrorCode } from "@barber/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 

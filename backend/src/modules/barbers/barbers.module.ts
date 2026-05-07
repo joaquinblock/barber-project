@@ -5,8 +5,10 @@ import { Barber } from './entities/barber.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '../users/users.module';
 
+import { AuthModule } from '../auth/auth.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Barber]), UsersModule], //importamos el modulo entero, al importar el UsersModule, Nest te da acceso a todo lo que ese módulo haya puesto en su lista de exports.
+  imports: [TypeOrmModule.forFeature([Barber]), UsersModule, AuthModule],
   controllers: [BarbersController],
   providers: [BarbersService],
 })

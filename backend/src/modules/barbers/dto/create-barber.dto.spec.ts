@@ -1,7 +1,7 @@
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { CreateBarberDto } from './create-barber.dto';
-import { UserRole } from '@/modules/users/enum/user-role.enum';
+import { UserRole } from '@barber/shared/types';
 import { expect, describe, it } from '@jest/globals';
 
 describe('CreateBarberDto', () => {

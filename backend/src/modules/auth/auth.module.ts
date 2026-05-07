@@ -1,10 +1,10 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UsersModule } from '../users/users.module';
 import { BarbershopModule } from '../barbershop/barbershop.module';
 
 @Module({
@@ -19,7 +19,7 @@ import { BarbershopModule } from '../barbershop/barbershop.module';
       }),
     }),
     UsersModule,
-    BarbershopModule
+    forwardRef(() => BarbershopModule)
   ],
   controllers: [AuthController],
   providers: [AuthService],
