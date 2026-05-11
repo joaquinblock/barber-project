@@ -1,5 +1,6 @@
 import { HttpError, ApiError, ErrorCode } from "@barber/shared/errors";
 import { AUTH_STORAGE_KEYS } from "../../auth/constants/auth.constants";
+import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,6 +12,7 @@ export interface ApiResponse<T> {
     message: string;
   };
 }
+
 
 /**
  * Wrapper de fetch para simplificar las peticiones al API.
@@ -39,35 +41,57 @@ const request = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  /* ==========================================
+      Transporte
+  ========================================== */
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (e) {
+    /* La petición fue abortada o el servidor es inalcanzable. 
+       Es un error de infraestructura o cliente.
+    */
+    throw new HttpError(0, "No se pudo conectar con el servidor. Verifica tu conexión.");
+  }
 
-  // Manejo de 204 No Content o respuestas vacías
-  if (response.status === 204 || response.headers.get("content-length") === "0") {
-    if (!response.ok) {
-      throw new HttpError(response.status, "Error en la petición (No Content)");
-    }
+  /* ==========================================
+        204 No Content o respuestas vacías
+  ========================================== */
+
+  if (response.status === 204) {
     return undefined as T;
   }
 
-  // Intentamos parsear el JSON incluso si la respuesta no es ok para obtener el mensaje de error del backend
+  /* ==========================================
+     Intentamos parsear siempre el body, incluso si la respuesta no es ok 
+     para obtener el mensaje de error del backend.
+     (si no es json lanzará una excepción y lo manejamos)
+  ========================================== */
   let body: ApiResponse<T>;
   try {
-    body = await response.json();
+    const text = await response.text();
+    body = text ? JSON.parse(text) : { success: response.ok, data: undefined as T };
   } catch (e) {
-    // No se pudo parsear el JSON — error de infraestructura puro
+    // No se pudo parsear el JSON — error de infraestructura puro o respuesta no JSON
     throw new HttpError(response.status, "Error de red o formato de respuesta inválido");
   }
 
+
+  /* ==========================================
+      Clasificación del error
+  ========================================== */
   if (!response.ok || !body.success) {
-    // Si el backend mandó un code semántico → error de lógica de negocio (ApiError)
-    if (body.error?.code) {
-      throw new ApiError(body.error.code, body.error.message ?? "Error en la petición al servidor");
+    const code = body.error?.code ?? ErrorCode.SERVER_ERROR;
+    const message = body.error?.message ?? "Error en la petición al servidor";
+    
+    if (code) {
+      throw new ApiError(code, message); // backend procesó el error, tiene code semántico
     }
-    // Sin code semántico → error de infraestructura (HttpError)
-    throw new HttpError(response.status, body.error?.message ?? "Error en la petición al servidor");
+
+    throw new HttpError(response.status, message); // no hay code, error de infra
   }
 
   return body.data;

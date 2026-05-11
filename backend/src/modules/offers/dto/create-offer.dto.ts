@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, Min, MaxLength, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, MaxLength, IsInt, ValidateIf } from 'class-validator';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
 import { CreateOfferDTO } from '@barber/shared/types';
 
@@ -10,6 +10,7 @@ export class CreateOfferDto implements CreateOfferDTO  {
   title!: string;
 
   @Trim()
+  @ValidateIf((o) => o.description !== null)
   @IsString()
   description!: string | null;
 

@@ -4,7 +4,7 @@ import clsx from "clsx";
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "selectable" | "trash" | "danger" ;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   isSelected?: boolean; // Para el estado seleccionado en el caso de "selectable"
 };
 

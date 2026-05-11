@@ -1,6 +1,6 @@
 export type ExceptionType = 'full-day' | 'range';
 
-export type ExceptionDTO = {
+export type CreateExceptionDTO = {
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
   reason: string | null;
@@ -9,6 +9,8 @@ export type ExceptionDTO = {
   barbershopId: string;
 };
 
-export type ExceptionResponseDTO = ExceptionDTO & {
+export type ExceptionResponseDTO = CreateExceptionDTO & {
   id: string;
+  createdAt: string;
+  updatedAt: string;
 };

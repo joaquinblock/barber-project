@@ -1,0 +1,32 @@
+.text-info{
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.card-title {
+    font-weight: var(--font-bold);
+    color: var(--gray-700);
+    font-size: var(--text-base);
+}
+
+.card-price, .card-time, .dot, .icon{
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.active{
+    color: var(--accent-deeper);
+}
+
+.button-box {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.buttons-container {
+    display: flex;
+    gap: 0.5rem;
+}

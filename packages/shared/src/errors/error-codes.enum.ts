@@ -1,9 +1,20 @@
 export const ErrorCode = {
   // ── Genéricos ──────────────────────────────────────────────────────────────
-  SERVER_ERROR: 'SERVER_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-  BAD_REQUEST: 'BAD_REQUEST',
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+
+   //Errores del servidor (5xx)
+   SERVER_ERROR: 'SERVER_ERROR', //500 - error interno del servidor
+   BAD_GATEWAY: 'BAD_GATEWAY', //502 - error en la puerta de enlace
+   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE', //503 - servicio no disponible
+   GATEWAY_TIMEOUT: 'GATEWAY_TIMEOUT', //504 - lentitud en la respuesta del servidor
+   
+   //Errores del cliente (4xx)
+   BAD_REQUEST: 'BAD_REQUEST', //400 - peticion invalida 
+   UNAUTHORIZED: 'UNAUTHORIZED', //401 - no estas autenticado 
+   FORBIDDEN: 'FORBIDDEN', //403 - no tienes permiso para realizar la accion 
+   NOT_FOUND: 'NOT_FOUND', //404 - el recurso no existe 
+   CONFLICT: 'CONFLICT', //409 - el recurso ya existe 
 
   // ── Database ───────────────────────────────────────────────────────────────
   DB_UNIQUE_VIOLATION: 'DB_UNIQUE_VIOLATION',
@@ -39,6 +50,15 @@ export const ErrorCode = {
   OFFER_CREATION_FAILED: 'OFFER_CREATION_FAILED',
   OFFER_NOT_FOUND: 'OFFER_NOT_FOUND',
   OFFER_OVERLAP: 'OFFER_OVERLAP',
+  OFFER_INVALID_TITLE: 'OFFER_INVALID_TITLE',
+  OFFER_INVALID_PRICE: 'OFFER_INVALID_PRICE',
+  OFFER_INVALID_DURATION: 'OFFER_INVALID_DURATION',
+
+  // ── Exceptions ───────────────────────────────────────────────────────────
+  EXCEPTION_CREATION_FAILED: 'EXCEPTION_CREATION_FAILED',
+  EXCEPTION_NOT_FOUND: 'EXCEPTION_NOT_FOUND',
+  EXCEPTION_OVERLAP: 'EXCEPTION_OVERLAP',
+  EXCEPTION_INVALID_DATE: 'EXCEPTION_INVALID_DATE',
 } as const;
 
 export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];

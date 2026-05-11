@@ -1,7 +1,6 @@
-import { validate } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
-import { CreateOfferDto } from './create-offer.dto';
-import { expect, describe, it } from '@jest/globals';
+import { validate } from "class-validator";
+import { plainToInstance } from "class-transformer";
+import { CreateOfferDto } from "./create-offer.dto";
 
 describe('CreateOfferDto', () => {
   const validateDto = async (dto: any) => {
@@ -9,83 +8,70 @@ describe('CreateOfferDto', () => {
     return await validate(instance);
   };
 
-  const getErrorMessages = (errors: any[]) => {
-    return errors
-      .map(e => `${e.property}: ${Object.values(e.constraints || {}).join(', ')}`)
-      .join(' | ');
+  const validBase = {
+    title: 'Corte de Pelo',
+    description: 'Descripción',
+    price: 1500.50,
+    duration: 45,
   };
 
-  it('debería validar una Oferta válida', async () => {
-    const dto = {
-      title: 'Corte de Pelo + Barba',
-      description: 'Un servicio completo para el caballero.',
-      price: 1500.50,
-      duration: 45,
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001'
-    };
-
-    const errors = await validateDto(dto);
-    expect(getErrorMessages(errors)).toBe('');
-  });
-
-  // --- CASOS DE FALLA ---
-
-  it('debería fallar si el precio es negativo', async () => {
-    const dto = { price: -100 };
-    const errors = await validateDto(dto);
-    expect(errors.some(e => e.property === 'price')).toBe(true);
-  });
-
-  it('debería fallar si el precio tiene más de 2 decimales', async () => {
-    const dto = { price: 100.555 }; // Max 2 decimales según tu DTO
-    const errors = await validateDto(dto);
-    expect(errors.some(e => e.property === 'price')).toBe(true);
-  });
-
-  it('debería fallar si la duración es menor a 1 minuto', async () => {
-    const dto = { duration: 0 };
-    const errors = await validateDto(dto);
-    expect(errors.some(e => e.property === 'duration')).toBe(true);
-  });
-
-  it('debería fallar si el título está vacío o es muy largo', async () => {
-    const dtoVacio = { title: '' };
-    const dtoLargo = { title: 'a'.repeat(101) }; // Max 100
-
-    const errVacio = await validateDto(dtoVacio);
-    const errLargo = await validateDto(dtoLargo);
-
-    expect(errVacio.some(e => e.property === 'title')).toBe(true);
-    expect(errLargo.some(e => e.property === 'title')).toBe(true);
-  });
-
-  it('debería fallar si los IDs no son UUID válidos', async () => {
-    const dto = { 
-      barberId: '123-no-soy-uuid',
-      barbershopId: 'abc-tampoco'
-    };
-    const errors = await validateDto(dto);
-    expect(errors.some(e => e.property === 'barberId')).toBe(true);
-    expect(errors.some(e => e.property === 'barbershopId')).toBe(true);
-  });
-
-  it('debería ser válido aunque no envíe la descripción (es opcional)', async () => {
-    const dto = {
-      title: 'Corte Solo',
-      price: 1000,
-      duration: 30,
-      barberId: '550e8400-e29b-41d4-a716-446655440000',
-      barbershopId: '550e8400-e29b-41d4-a716-446655440001'
-    };
-    // No incluimos description
-    const errors = await validateDto(dto);
+  it('debería validar una oferta válida', async () => {
+    const errors = await validateDto(validBase);
     expect(errors.length).toBe(0);
   });
 
+  describe('validaciones de description', () => {
+    it('debería fallar cuando falta description', async () => {
+      const { description, ...dto } = validBase;
+      const errors = await validateDto(dto);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it('debería ser válido cuando description es null', async () => {
+      const dto = { ...validBase, description: null };
+      const errors = await validateDto(dto);
+      expect(errors.length).toBe(0);
+    });
+
+    it('debería aplicar Trim a la descripción si existe', async () => {
+      const instance = plainToInstance(CreateOfferDto, { ...validBase, description: '  Detalle  ' });
+      expect(instance.description).toBe('Detalle');
+    });
+  });
+
+  describe('casos frontera (éxito)', () => {
+    it.each([
+      { field: 'title', value: 'a'.repeat(100), desc: 'exactamente 100 caracteres' },
+      { field: 'price', value: 0,               desc: 'cero' },
+      { field: 'price', value: 0.01,            desc: 'mínimo decimal' },
+      { field: 'duration', value: 1,            desc: 'mínimo 1 minuto' },
+    ])('debería ser válido cuando $field es $desc', async ({ field, value }) => {
+      const dto = { ...validBase, [field]: value };
+      const errors = await validateDto(dto);
+      expect(errors.length).toBe(0);
+    });
+  });
+
+  describe('casos de error y fronteras (falla)', () => {
+    it.each([
+      { field: 'title', value: '',              desc: 'vacío' },
+      { field: 'title', value: 'a'.repeat(101), desc: 'muy largo (>100)' },
+      { field: 'title', value: 123,             desc: 'no es string' },
+      { field: 'price', value: -1,              desc: 'negativo' },
+      { field: 'price', value: 100.555,         desc: 'más de 2 decimales' },
+      { field: 'price', value: '100',           desc: 'es un string' },
+      { field: 'duration', value: 0,            desc: 'menor a 1' },
+      { field: 'duration', value: 0.5,          desc: 'no es entero' },
+      { field: 'duration', value: '30',         desc: 'es un string' },
+    ])('debería fallar cuando $field es $desc', async ({ field, value }) => {
+      const dto = { ...validBase, [field]: value };
+      const errors = await validateDto(dto);
+      expect(errors.some(e => e.property === field)).toBe(true);
+    });
+  });
+
   it('debería aplicar Trim al título', async () => {
-    const dto = { title: '   Corte   ' };
-    const instance = plainToInstance(CreateOfferDto, dto);
+    const instance = plainToInstance(CreateOfferDto, { ...validBase, title: '   Corte   ' });
     expect(instance.title).toBe('Corte');
   });
 });

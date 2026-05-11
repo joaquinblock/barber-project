@@ -9,47 +9,53 @@ import { GetBarber } from '@/common/decorators/get-barber.decorator';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 
 @Controller('offers')
+@UseGuards(AuthGuard, RolesGuard)
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
-  @Get()
-  @UseGuards(AuthGuard, RolesGuard)
+  @Get('me')
   @Roles(UserRole.BARBER)
   async findByBarber(
     @GetBarber() barber: { barberId: string, barbershopId: string },
   ): Promise<OfferResponseDTO[]> {
-    return await this.offersService.findAllOffersByBarber(barber.barberId, barber.barbershopId);
+    return await this.offersService.findAllOffersByBarber(barber.barbershopId, barber.barberId);
+  }
+
+  @Get('barbershop/:barbershopId/barber/:barberId')
+  @Roles(UserRole.BARBER, UserRole.CUSTOMER)
+  async findAllByBarberId(
+    @Param('barbershopId') barbershopId: string,
+    @Param('barberId') barberId: string,
+  ): Promise<OfferResponseDTO[]> {
+    return await this.offersService.findAllOffersByBarber(barbershopId, barberId);
   }
 
   @Post()
-  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.BARBER)
   async createOffer(
     @Body() createOfferDto: CreateOfferDto, 
     @GetBarber() barber: { barberId: string, barbershopId: string }
     ): Promise<OfferResponseDTO> {
-    return await this.offersService.createOfferByBarber(createOfferDto, barber.barberId, barber.barbershopId);
+    return await this.offersService.createOfferByBarber(createOfferDto, barber.barbershopId, barber.barberId);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.BARBER)
   async updateOffer(
     @Param('id') id: string, 
     @Body() updateOfferDto: UpdateOfferDto, 
     @GetBarber() barber: { barberId: string, barbershopId: string }
     ): Promise<OfferResponseDTO> {
-    return await this.offersService.updateOfferByBarber(id, updateOfferDto, barber.barberId, barber.barbershopId);
+    return await this.offersService.updateOfferByBarber(id, updateOfferDto, barber.barbershopId, barber.barberId);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.BARBER)
   async removeOffer(
     @Param('id') id: string, 
     @GetBarber() barber: { barberId: string, barbershopId: string }
   ): Promise<void> {
-    return await this.offersService.removeOfferByBarber(id, barber.barberId, barber.barbershopId);
+    return await this.offersService.removeOfferByBarber(id, barber.barbershopId, barber.barberId);
   }
 
   

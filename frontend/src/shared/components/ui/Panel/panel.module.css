@@ -5,3 +5,9 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
 }
+
+.panel-header{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}

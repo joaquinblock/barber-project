@@ -1,6 +1,5 @@
 .card-container {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     border-radius: var(--rounded-xl);
     box-shadow: var( --shadow-sm);

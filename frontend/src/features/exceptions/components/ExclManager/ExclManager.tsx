@@ -1,45 +1,45 @@
 import { Button, EmptyState, List, Modal, Panel, FeatureErrorBoundary } from "@/shared/components/ui";
-import type { Exception } from "@barber/shared/types";
+import type { CreateExceptionDTO, ExceptionResponseDTO } from "@barber/shared/types";
 import { Calendar, Plus } from "lucide-react";
 import styles from "./excl-manager.module.css";
 import { Suspense, useState } from "react";
 import { ExclCard, ExclModal } from "@/features/exceptions/components";
-import { useExcl } from "@/features/exceptions/hooks/useExcl";
+import { useCreateFullDayException, useDeleteException, useGetExclusions } from "../../hooks/useExcl";
 
-type ExclManagerProps = {
-   barbershopId: string;
-   barberId: string;
-};
+const ExclManagerContent = () => {
 
-const ExclManagerContent = ({ barbershopId, barberId }: ExclManagerProps) => {
+  const { mutateAsync: createException } = useCreateFullDayException();
+  const { mutateAsync: deleteException } = useDeleteException();
+  const { exceptions, isLoading } = useGetExclusions();
 
-  const { data: exceptions, addException, deleteException } = useExcl(barbershopId, barberId);
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedException, setSelectedException] = useState<ExceptionResponseDTO | null>(null);
 
-  const handleAddException = (newException: Exception) => {
-    addException(newException);
-    setIsModalOpen(false);
-  };
+  
 
   return (
     <>
       <Panel
         title="Excepciones"
-        subtitle="Agrega dias o periodos donde no trabajas, independiente de tu horario habitual"
+        subtitle="Agrega dias o periodos donde no trabajarás"
         icon={Calendar}
+        button={<Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}><Plus size={16} /> Agregar </Button>}
       >
         <div className={styles.exclManagerContent}>
-          <List
-            items={exceptions}
-            renderItem={(exception) => <ExclCard key={exception.id} exception={exception} onDelete={(id) => deleteException(id)} />}
-            emptyComponent={
-              <EmptyState text="No hay excepciones registradas" />
-            }
-          />
-          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-            <Plus size={18} /> <span>Agregar Excepción</span>
-          </Button>
+          {isLoading ? (
+            <p>Cargando excepciones...</p>
+          ) : exceptions && exceptions.length > 0 ? (
+            <List
+              items={exceptions}
+              renderItem={(exception) => <ExclCard key={exception.id} exception={exception} onDelete={(id) => deleteException(id)} />}
+              emptyComponent={<EmptyState text="Aún no tienes excepciones" />}
+            />
+          ) : (
+            <EmptyState text="Aún no tienes excepciones" />
+          )}
         </div>
       </Panel>
 
@@ -53,10 +53,10 @@ const ExclManagerContent = ({ barbershopId, barberId }: ExclManagerProps) => {
   );
 };
 
-export const ExclManager = (props: ExclManagerProps) => (
+export const ExclManager = () => (
   <FeatureErrorBoundary featureName="Exclusions">
     <Suspense fallback={<div>Cargando exclusiones...</div>}>
-      <ExclManagerContent {...props} />
+      <ExclManagerContent />
     </Suspense>
   </FeatureErrorBoundary>
 );

@@ -18,7 +18,7 @@ export class Exception {
   endDate!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  reason?: string;
+  reason!: string | null;
 
   @Column({
     type: 'enum',
@@ -26,6 +26,12 @@ export class Exception {
     default: ExceptionType.FULL_DAY
   })
   type!: ExceptionType;
+
+  @Column({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt!: Date;
+
+  @Column({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  updatedAt!: Date;
 
   // --- RELACIÓN CON EL BARBERO ---
 

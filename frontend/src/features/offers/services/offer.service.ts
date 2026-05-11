@@ -1,8 +1,8 @@
 import { api } from "@/core/api/utils/api.wrapper";
-import type { OfferRequestDTO, OfferResponseDTO } from "@barber/shared/types";
+import type { CreateOfferDTO, UpdateOfferDTO, OfferResponseDTO } from "@barber/shared/types";
 
 export class OfferService {
-  private static readonly OFFERS_ENDPOINT = "/api/offers";
+  private static readonly OFFERS_ENDPOINT = "/offers";
 
   /**
    * GET: Obtiene los servicios ofrecidos por un barbero por su ID.
@@ -15,7 +15,7 @@ export class OfferService {
    * POST: Crea un nuevo servicio ofrecido por el barbero.
    */
   static async createOffer(
-    createOfferDto: OfferRequestDTO,
+    createOfferDto: CreateOfferDTO,
   ): Promise<OfferResponseDTO> {
     return api.post<OfferResponseDTO>(this.OFFERS_ENDPOINT, createOfferDto);
   }
@@ -25,7 +25,7 @@ export class OfferService {
    */
   static async updateOffer(
     offerId: string,
-    updateOfferDto: Partial<OfferRequestDTO>,
+    updateOfferDto: UpdateOfferDTO,
   ): Promise<OfferResponseDTO> {
     return api.patch<OfferResponseDTO>(`${this.OFFERS_ENDPOINT}/${offerId}`, updateOfferDto);
   }

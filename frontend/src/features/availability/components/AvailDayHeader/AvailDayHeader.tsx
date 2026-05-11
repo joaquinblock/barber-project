@@ -10,7 +10,7 @@ export const AvailDayHeader = ({ day, isWorking , onChange }: AvailDayHeaderProp
     return (
         <div className={styles.availDayHeader}>
             <span className={styles.availDayHeaderSpan}>{day}</span>
-            <Switch variant="ant" label={isWorking ? "Trabajo" : "Libre"} checked={isWorking} onChange={onChange}></Switch>
+            <Switch variant="ant" label={isWorking ? "Día de trabajo" : "Día libre"} checked={isWorking} onChange={onChange}></Switch>
         </div>
     );
 }

@@ -24,6 +24,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         // Si el servicio lanzó con un `code` semántico propio, lo usamos directamente.
         // De lo contrario, generamos uno a partir del tipo de error HTTP.
         code = exceptionResponse.code
+          ?? (status === HttpStatus.UNAUTHORIZED ? ErrorCode.UNAUTHORIZED : null)
+          ?? (status === HttpStatus.FORBIDDEN ? ErrorCode.FORBIDDEN : null)
+          ?? (status === HttpStatus.NOT_FOUND ? ErrorCode.NOT_FOUND : null)
+          ?? (status === HttpStatus.CONFLICT ? ErrorCode.CONFLICT : null)
+          ?? (status === HttpStatus.BAD_REQUEST ? ErrorCode.BAD_REQUEST : null)
           ?? (exceptionResponse.error
               ? exceptionResponse.error.toUpperCase().replace(/\s+/g, '_')
               : 'HTTP_EXCEPTION');

@@ -6,6 +6,7 @@ type PanelProps = {
   title: string;
   subtitle: string;
   icon: LucideIcon;
+  button?: React.ReactNode;
 };
 
 export const Panel = ({
@@ -13,11 +14,15 @@ export const Panel = ({
   title,
   subtitle,
   icon: Icon,
+  button
 }: PanelProps) => {
   return (
     <div className={styles.panel}>
+      <div className={styles.panelHeader}>
         <Title textTitle={title} textSubtitle={subtitle} icon={Icon} />
-        {children}
+        {button}
+      </div>
+      {children}
     </div>
   );
 };
