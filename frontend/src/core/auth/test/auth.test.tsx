@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from '@/core/auth/context/auth.context';
 import { AuthService } from '../services/auth.service';
 import { beforeEach, vi } from 'vitest';
 import { expect, describe, it } from 'vitest';
-import type { User } from '@barber/shared/types';
+import type { User } from '@business/shared/types';
 import { AUTH_STORAGE_KEYS } from '../constants/auth.constants';
 
 // ---- Mocks ----

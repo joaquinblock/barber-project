@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CustomersController } from './customers.controller';
-import { Type } from 'class-transformer';
 import { Customer } from './entities/customer.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 

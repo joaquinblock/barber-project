@@ -1,5 +1,5 @@
 import type { WeeklyAvailability } from "../types";
-import type { AvailResponseDTO, DayKey, HourString, TimeRangeResponse } from "@barber/shared/types";
+import type { AvailResponseDTO, DayKey, HourString, TimeRangeResponse } from "@business/shared/types";
 
 // Un array auxiliar con todos los días para facilitar la inicialización
 const ALL_DAYS: DayKey[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];

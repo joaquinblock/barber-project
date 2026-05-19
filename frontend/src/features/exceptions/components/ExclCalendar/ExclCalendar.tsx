@@ -1,13 +1,12 @@
 import { DayPicker, type DateRange } from "react-day-picker";
 import "./excl-calendar.css";
 import { es } from "date-fns/locale";
+import type { ExceptionType} from "@business/shared";
 
 type ExclCalendarProps = {
-  type: "full_day" | "range";
-  // En el puente (props) dejamos que vengan ambas
-  selectedDay?: Date | DateRange;
-  // Usamos 'any' en el onSelect del puente para no pelear con la firma estricta de la librería
-  onSelect?: (day: any) => void;
+  type: ExceptionType;
+  selectedDay: Date | DateRange | undefined;
+  onSelect?: (day: Date | DateRange | undefined) => void;
 };
 
 export const ExclCalendar = ({
@@ -15,7 +14,7 @@ export const ExclCalendar = ({
   selectedDay,
   onSelect,
 }: ExclCalendarProps) => {
-  if (type === "full_day") {
+  if (type === "full-day") {
     return (
       <DayPicker
         key="single-picker"

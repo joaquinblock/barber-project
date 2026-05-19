@@ -1,7 +1,7 @@
-import { Entity, Column, ManyToOne, JoinColumn, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { Barber } from '@/modules/barbers/entities/barber.entity';
+import { Entity, Column, ManyToOne, JoinColumn, Index, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Professional } from '@/modules/professionals/entities/professional.entity';
 import { ExceptionType } from '../enums/exception-types.enum';
-import { Barbershop } from '@/modules/barbershop/entities/barbershop.entity';
+import { Business } from '@/modules/business/entities/business.entity';
 
 @Entity('exceptions')
 export class Exception {
@@ -11,7 +11,7 @@ export class Exception {
 
   @Index()
   @Column({ type: 'date', name: 'start_date' })
-  startDate!: string; // Usamos string para que coincida con tu DateKey "YYYY-MM-DD"
+  startDate!: string;
 
   @Index()
   @Column({ type: 'date', name: 'end_date' })
@@ -27,29 +27,29 @@ export class Exception {
   })
   type!: ExceptionType;
 
-  @Column({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 
-  @Column({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt!: Date;
 
-  // --- RELACIÓN CON EL BARBERO ---
+  // --- RELACIÓN CON EL PROFESSIONALO ---
 
   @Index()
-  @Column({ type: 'uuid', name: 'barber_id' })
-  barberId!: string;
+  @Column({ type: 'uuid', name: 'professional_id' })
+  professionalId!: string;
 
-  @ManyToOne(() => Barber, (barber) => barber.exceptions, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barber_id' })
-  barber!: Barber;
+  @ManyToOne(() => Professional, (professional) => professional.exceptions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'professional_id' })
+  professional!: Professional;
 
-  // --- RELACIÓN CON LA BARBERÍA ---
+  // --- RELACIÓN CON LA PROFESSIONALÍA ---
   
   @Index()
-  @Column({ type: 'uuid', name: 'barbershop_id' })
-  barbershopId!: string;
+  @Column({ type: 'uuid', name: 'business_id' })
+  businessId!: string;
   
-  @ManyToOne(() => Barbershop, (barbershop) => barbershop.exceptions, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barbershop_id' })
-  barbershop!: Barbershop;
+  @ManyToOne(() => Business, (business) => business.exceptions, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'business_id' })
+  business!: Business;
 }

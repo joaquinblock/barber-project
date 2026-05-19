@@ -12,21 +12,21 @@ import { CreateApptNormalDto } from './dto/create-appt-normal.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { UserRole } from '@barber/shared/types';
+import { UserRole } from '@business/shared/types';
 
 @Controller('appointments')
 export class ApptsController {
   constructor(private readonly apptsService: ApptsService) {}
 
   @Get()
-  findByBarber(@Query('barberId') barberId: string) {
-    return this.apptsService.findByBarber(barberId);
+  findByProfessional(@Query('professionalId') professionalId: string) {
+    return this.apptsService.findByProfessional(professionalId);
   }
 
   @Post()
   create(@Body() createApptDto: CreateApptNormalDto) {
     return {
-      message: '¡Éxito! Esto crea una cita para un barbero específico',
+      message: '¡Éxito! Esto crea una cita para un professionalo específico',
       data: {
         ...createApptDto,
         dateValue: createApptDto.date,
@@ -38,10 +38,10 @@ export class ApptsController {
 
   @Post('block')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.BARBER, UserRole.ADMIN)
+  @Roles(UserRole.PROFESSIONAL, UserRole.ADMIN)
   createBlock(@Body() createApptBlockedDto: CreateApptBlockedDto) {
     return {
-      message: '¡Éxito! Esto bloquea un horario para un barbero específico',
+      message: '¡Éxito! Esto bloquea un horario para un professionalo específico',
       data: createApptBlockedDto,
       timestamp: new Date().toISOString(),
     };

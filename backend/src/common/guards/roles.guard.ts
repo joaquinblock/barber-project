@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserRole } from '@barber/shared/types';
-import { ErrorCode } from '@barber/shared/errors';
+import { UserRole } from '@business/shared/types';
+import { ErrorCode } from '@business/shared/errors';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()

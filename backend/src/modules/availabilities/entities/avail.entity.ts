@@ -7,9 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn, 
 } from 'typeorm';
-import { Barber } from '@/modules/barbers/entities/barber.entity';
+import { Professional } from '@/modules/professionals/entities/professional.entity';
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
-import { Barbershop } from '@/modules/barbershop/entities/barbershop.entity';
+import { Business } from '@/modules/business/entities/business.entity';
 
 
 @Entity('availabilities')
@@ -33,19 +33,19 @@ export class Avail {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt!: Date;
 
-  @Column({ name: 'barber_id' })
-  barberId!: string;
+  @Column({ name: 'professional_id' })
+  professionalId!: string;
 
-  @ManyToOne(() => Barber, (barber) => barber.availabilities, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barber_id' })
-  barber!: Barber;
+  @ManyToOne(() => Professional, (professional) => professional.availabilities, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'professional_id' })
+  professional!: Professional;
 
   
-  @Column({ type: 'uuid', name: 'barbershop_id' })
-  barbershopId!: string;
+  @Column({ type: 'uuid', name: 'business_id' })
+  businessId!: string;
 
-  @ManyToOne(() => Barbershop, (barbershop) => barbershop.availabilities, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barbershop_id' })
-  barbershop!: Barbershop;
+  @ManyToOne(() => Business, (business) => business.availabilities, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'business_id' })
+  business!: Business;
 
 }

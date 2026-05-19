@@ -1,14 +1,15 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/auth.context";
-import type { UserRole } from "@barber/shared/types";
+import type { UserRole } from "@business/shared/types";
 import { ROUTES_PATH } from "../constants/auth.routes.constants";
+import { useAuth } from "../hooks/useAuth";
 
 type ProtectedRouteProps = {
   allowedRoles?: UserRole[]; 
+  matchAll?: boolean;
 };
 
 //Hacemos dos chequeos en uno si esta logueado y que rol tiene
-export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ allowedRoles, matchAll = false }: ProtectedRouteProps) => {
 
   const { isAuthenticated, isInitialLoading, user } = useAuth();
 
@@ -16,8 +17,15 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   if (!isAuthenticated) return <Navigate to={ROUTES_PATH.PUBLIC.LOGIN} replace />;
 
-  if (allowedRoles && (!user || !user.roles.some(role => allowedRoles.includes(role)))) {
-    return <Navigate to={ROUTES_PATH.COMMON.UNAUTHORIZED} replace />;
+  if (allowedRoles && user) {
+    const userRoles = user.roles as UserRole[];
+    const hasRoles = matchAll 
+      ? allowedRoles.every(role => userRoles.includes(role))
+      : allowedRoles.some(role => userRoles.includes(role));
+
+    if (!hasRoles) {
+      return <Navigate to={ROUTES_PATH.COMMON.UNAUTHORIZED} replace />;
+    }
   }
 
   //Si pasa todos los chequeos, renderizamos el componente protegido seria lo que dentro de ProtectedRoute en el AppRouter, por ejemplo <ProtectedRoute allowedRoles={["ADMIN"]}><AdminPage/></ProtectedRoute>

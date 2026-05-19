@@ -30,10 +30,10 @@ export class Customer {
   // --- DATOS DE NEGOCIO ---
 
   @Column({ type: 'date', nullable: true, name: 'birth_date' })
-  birthDate?: string; // En la DB es date, en TS lo manejamos mejor como string YYYY-MM-DD
+  birthDate!: string | null; // En la DB es date, en TS lo manejamos mejor como string YYYY-MM-DD
 
   @Column({ type: 'int', name: 'loyalty_points', nullable: true })
-  loyaltyPoints?: number;
+  loyaltyPoints!: number | null;
 
   // --- RELACIONES ---
   @OneToMany(() => Appt, (appt) => appt.customer) // Corregido el nombre de la propiedad inversa

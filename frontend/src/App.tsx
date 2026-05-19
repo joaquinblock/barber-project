@@ -1,11 +1,13 @@
 import { AppRouter } from '@/routes/AppRouter';
-import { AuthProvider } from '@/core/auth/context/auth.context';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
-    <AuthProvider>
+    <>
+      {/* El toast de sonner no se muestra por algún motivo */}
+      <Toaster richColors position="top-right" />  
       <AppRouter />
-    </AuthProvider>
+    </>
   );
 }
 

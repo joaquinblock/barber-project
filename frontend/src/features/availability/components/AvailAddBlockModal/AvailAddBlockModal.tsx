@@ -1,8 +1,8 @@
 import { Modal, Button, Input } from "@/shared/components/ui";
 import { useState } from "react";
-import { Alert } from "@/shared/components/ui";
+import { ErrorInline } from "@/shared/components/ui";
 import { CircleAlert } from "lucide-react";
-import type { DayKey, HourString, TimeRangeRequest } from "@barber/shared/types";
+import type { DayKey, HourString, TimeRangeRequest } from "@business/shared/types";
 import type { WeeklyAvailability } from "../../types";
 import { DAYS_CONFIG } from "@/shared/constants/days";
 import styles from "./avail-add-block-modal.module.css";
@@ -36,7 +36,8 @@ export const AvailAddBlockModal = ({
       )
     : [];
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
     // onConfirm en el padre ya se encarga de cerrar si es exitoso
     await onConfirm(localBlock);
   };
@@ -61,7 +62,7 @@ export const AvailAddBlockModal = ({
         </div>
       )}
 
-      <div className={styles.formContainer}>
+      <form className={styles.formContainer} onSubmit={handleConfirm}>
       <Input
         type="time" //el browser ya se encarga de validar el formato, no necesito regex ni nada
         variant="inline"
@@ -77,18 +78,18 @@ export const AvailAddBlockModal = ({
         onChange={(e) => setLocalBlock(prev => ({ ...prev, endTime: e.target.value as HourString }))}
       />
       {errorMessage && (
-        <Alert variant="error" iconLeft={CircleAlert}>
+        <ErrorInline iconLeft={CircleAlert}>
           {errorMessage}
-        </Alert>
+        </ErrorInline>
       )}
       <Button 
-        onClick={handleConfirm}
+        type="submit"
         disabled={!localBlock.startTime || !localBlock.endTime}
         variant="primary"
       >
         Confirmar
       </Button>
-      </div>
+      </form>
     </Modal>
   );
 };

@@ -3,12 +3,12 @@ import {
     IsEnum, IsStrongPassword, MaxLength, MinLength, IsPhoneNumber, 
     IsBoolean
 } from 'class-validator';
-import { UserRole } from '@barber/shared/types';
+import { UserRole } from '@business/shared/types';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
 import { ToPhoneNumber } from '@/common/helpers/transforms/to-phone-number.transform';
 import { ToLowerCase } from '@/common/helpers/transforms/to-lower-case.transform';
 
-export class CreateUserDto {
+export class CreateUserDto{
     
     // --- EMAIL ---
     @IsEmail({}, { message: 'El correo electrónico no es válido' })
@@ -50,7 +50,7 @@ export class CreateUserDto {
     @IsEnum(UserRole, 
         { 
             each: true, // Permite validar cada elemento del array
-            message: 'El rol debe ser BARBER o ADMIN' 
+            message: 'El rol debe ser PROFESSIONAL o ADMIN' 
         }
     )
     roles!: UserRole[];

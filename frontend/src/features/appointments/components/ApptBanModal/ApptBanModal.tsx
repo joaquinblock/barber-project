@@ -1,4 +1,4 @@
-import { Modal, Alert, Button } from "@/shared/components/ui";
+import { Modal, Alert, Button, ErrorInline } from "@/shared/components/ui";
 import { Ban, CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { formatDateToDisplay} from "@/shared//utils/time-utils";
@@ -31,6 +31,13 @@ export const ApptBanModal = ({
     reason: "",
   });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onConfirm(banData)) {
+      onClose();
+    }
+  };
+
   return (
     <Modal variant="block" iconLeft={Ban} text="Bloquear horario" onClose={onClose}>
       <Alert
@@ -42,6 +49,7 @@ export const ApptBanModal = ({
       </Alert>
 
       {/* INPUTS DIRECTOS (Como en AvailModal) */}
+      <form onSubmit={handleSubmit}>
       <Input
         type="time"
         label="Desde"
@@ -59,18 +67,19 @@ export const ApptBanModal = ({
       />
 
       {errorConfirmBlock && (
-        <Alert variant="error" iconLeft={CircleAlert}>
+        <ErrorInline iconLeft={CircleAlert}>
           {errorConfirmBlock}
-        </Alert>
+        </ErrorInline>
       )}
 
       <Button
         variant="block"
-        onClick={() => onConfirm(banData) && onClose()}
+        type="submit"
         disabled={!banData.startTime || !banData.endTime || !banData.reason}
       >
         Confirmar Bloqueo
       </Button>
+      </form>
 
     </Modal>
   );

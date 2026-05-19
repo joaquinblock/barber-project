@@ -3,12 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { CustomersModule } from './modules/customers/customers.module';
-import { BarbersModule } from './modules/barbers/barbers.module';
+import { ProfessionalsModule } from './modules/professionals/professionals.module';
 import { ApptsModule } from './modules/appointments/appts.module';
 import { AvailModule } from './modules/availabilities/avail.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ExceptionsModule } from './modules/exceptions/exceptions.module';
-import { BarbershopModule } from './modules/barbershop/barbershop.module';
+import { BusinessModule } from './modules/business/business.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
@@ -34,7 +34,7 @@ import { AuthModule } from './modules/auth/auth.module';
 
     CustomersModule,
 
-    BarbersModule,
+    ProfessionalsModule,
 
     ApptsModule,
 
@@ -44,7 +44,7 @@ import { AuthModule } from './modules/auth/auth.module';
 
     ExceptionsModule,
 
-    BarbershopModule,
+    BusinessModule,
     AuthModule
   ],
 })

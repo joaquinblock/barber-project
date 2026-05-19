@@ -10,10 +10,10 @@ import { Button, Calendar, Title, FeatureErrorBoundary } from "@/shared/componen
 import { Ban, Briefcase } from "lucide-react";
 import { formatDateToDisplay } from "@/shared/utils/time-utils";
 import { useAppointments } from "../../hooks/useAppt";
-import { ErrorCode } from "@barber/shared/errors";
+import { ErrorCode } from "@business/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 import { formatDateToDayKey } from "@/shared/utils/time-utils";
-import type { DateKey, PublicAvailabilityState } from "@barber/shared/types";
+import type { DateKey, PublicAvailabilityState } from "@business/shared/types";
 import styles from "./appt-manager.module.css";
 
 type ApptManagerProps = {

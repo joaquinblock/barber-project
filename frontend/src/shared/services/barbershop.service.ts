@@ -1,13 +1,13 @@
-import type { BarbershopDTO } from "@barber/shared/types";
+import type { BarbershopResponseDTO } from "@business/shared/types";
 import { api } from "@/core/api/utils/api.wrapper";
 
-export const barbershopService = {
-  getBySlug: async (slug: string): Promise<BarbershopDTO> => {
+export class barbershopService {
+  static async getBySlug(slug: string): Promise<BarbershopResponseDTO> {
     // El wrapper 'api' ya maneja:
     // - Base URL (importado desde .env)
     // - Parseo de JSON
     // - Manejo de errores (lanza HttpError)
     // - Desempaquetado de body.data
-    return api.get<BarbershopDTO>(`/barbershop/slug/${slug}`);
-  },
+    return api.get<BarbershopResponseDTO>(`/barbershop/slug/${slug}`);
+  }
 };

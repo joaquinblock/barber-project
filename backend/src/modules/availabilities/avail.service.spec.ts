@@ -39,7 +39,7 @@ describe('AvailService', () => {
   });
 
   describe('create', () => {
-    const barber = { barberId: 'barber-1', barbershopId: 'shop-1' };
+    const professional = { professionalId: 'professional-1', businessId: 'shop-1' };
     const createDto = {
       dayOfWeek: DayOfWeek.MON,
       startTime: '08:00',
@@ -49,14 +49,14 @@ describe('AvailService', () => {
     it('debería crear una disponibilidad si no hay solapamientos', async () => {
       mockAvailRepository.findOne.mockResolvedValue(null);
       mockAvailRepository.create.mockReturnValue(createDto);
-      mockAvailRepository.save.mockResolvedValue({ id: '1', ...createDto, ...barber });
+      mockAvailRepository.save.mockResolvedValue({ id: '1', ...createDto, ...professional });
 
-      const result = await service.create(createDto, barber);
+      const result = await service.create(createDto, professional);
 
       expect(result).toBeDefined();
       expect(mockAvailRepository.findOne).toHaveBeenCalledWith({
         where: {
-          barberId: barber.barberId,
+          professionalId: professional.professionalId,
           dayOfWeek: createDto.dayOfWeek,
           startTime: LessThan(createDto.endTime),
           endTime: MoreThan(createDto.startTime),
@@ -70,7 +70,7 @@ describe('AvailService', () => {
 
       await expect(service.create(
         { ...createDto, startTime: '09:00', endTime: '10:00' },
-        barber
+        professional
       )).rejects.toThrow(ConflictException);
     });
 
@@ -79,19 +79,19 @@ describe('AvailService', () => {
   
         await expect(service.create(
           { ...createDto, startTime: '07:00', endTime: '14:00' },
-          barber
+          professional
         )).rejects.toThrow(ConflictException);
     });
   });
 
   describe('update', () => {
-    const barberId = 'barber-1';
+    const professionalId = 'professional-1';
     const existingAvail = {
       id: '1',
       dayOfWeek: DayOfWeek.MON,
       startTime: '08:00',
       endTime: '13:00',
-      barberId,
+      professionalId,
     };
 
     it('debería actualizar si no hay solapamientos con otros registros', async () => {
@@ -100,7 +100,7 @@ describe('AvailService', () => {
         .mockResolvedValueOnce(null); // Para la validación de solapamiento
 
       const updateDto = { startTime: '09:00' };
-      await service.update('1', updateDto, barberId);
+      await service.update('1', updateDto, professionalId);
 
       expect(mockAvailRepository.save).toHaveBeenCalled();
     });
@@ -112,7 +112,7 @@ describe('AvailService', () => {
 
       const updateDto = { startTime: '12:00', endTime: '15:00' };
       
-      await expect(service.update('1', updateDto, barberId))
+      await expect(service.update('1', updateDto, professionalId))
         .rejects.toThrow(ConflictException);
     });
 
@@ -123,16 +123,16 @@ describe('AvailService', () => {
           .mockResolvedValueOnce(null); 
   
         const updateDto = { startTime: '08:30' }; // Solo cambia media hora
-        await service.update('1', updateDto, barberId);
+        await service.update('1', updateDto, professionalId);
   
         expect(mockAvailRepository.save).toHaveBeenCalled();
       });
 
       it('debería lanzar NotFoundException si intento actualizar un registro ajeno', async () => {
-        // Simulamos que el registro no existe para este barberId específico
+        // Simulamos que el registro no existe para este professionalId específico
         mockAvailRepository.findOne.mockResolvedValue(null);
 
-        await expect(service.update('123', { startTime: '09:00' }, 'barber-ajeno'))
+        await expect(service.update('123', { startTime: '09:00' }, 'professional-ajeno'))
           .rejects.toThrow(NotFoundException);
       });
   });

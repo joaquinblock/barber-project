@@ -7,7 +7,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('barber-project-jb/api'); // Prefijo global para todas las rutas
+  app.setGlobalPrefix('professional-project-jb/api'); // Prefijo global para todas las rutas
 
   app.enableCors(); //Habilita CORS para permitir solicitudes desde el frontend. PERO ES SOLO PARA DESARROLLO ASI QUE NO SE OLVIDEN DE CONFIGURARLO BIEN PARA PRODUCCIÓN
 

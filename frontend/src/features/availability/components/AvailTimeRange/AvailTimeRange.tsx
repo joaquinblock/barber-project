@@ -1,7 +1,7 @@
 import { Button, List } from "@/shared/components/ui";
 import { AvailWorkBlock } from "@/features/availability/components";
 import { Plus } from "lucide-react";
-import type { TimeRangeResponse } from "@barber/shared/types";
+import type { TimeRangeResponse } from "@business/shared/types";
 import styles from "./avail-time-range.module.css";
 
 type AvailTimeRangeProps = {

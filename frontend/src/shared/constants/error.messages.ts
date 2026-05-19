@@ -1,9 +1,11 @@
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 
 export const ERROR_MESSAGES: Partial<Record<ErrorCode, string>> = {
   // ── Genéricos ──────────────────────────────────────────────────────────────
   [ErrorCode.UNKNOWN_ERROR]: 'Ocurrió un error inesperado.',
   [ErrorCode.RATE_LIMIT_EXCEEDED]: 'Has realizado demasiadas peticiones. Intenta más tarde.',
+  [ErrorCode.INVALID_RANGE]: 'La fecha de fin debe ser posterior a la fecha de inicio.',
+  [ErrorCode.REQUIRED_FIELDS]: 'Todos los campos son obligatorios.',
 
   //── Errores del cliente (4xx) ───────────────────────────────────────────────
   [ErrorCode.BAD_REQUEST]: 'Solicitud inválida.', //400

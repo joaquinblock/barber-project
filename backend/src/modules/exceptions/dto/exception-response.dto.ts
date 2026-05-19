@@ -1,4 +1,5 @@
-import { ExceptionResponseDTO } from "@barber/shared";
+import { ToISOString } from "@/common/helpers/transforms/to-iso-string.transform";
+import { DateKey, ExceptionResponseDTO } from "@business/shared";
 import { Expose, Transform } from "class-transformer";
 
 export class ExceptionResponseDto implements ExceptionResponseDTO {
@@ -18,17 +19,17 @@ export class ExceptionResponseDto implements ExceptionResponseDTO {
     type: "full-day" | "range";
 
     @Expose()
-    barberId: string;
+    professionalId: string;
     
     @Expose()
-    barbershopId: string;
+    businessId: string;
 
     @Expose()
-    @Transform(({ value }) => value instanceof Date ? value.toISOString() : value)
+    @ToISOString()
     createdAt: string;
 
     @Expose()
-    @Transform(({ value }) => value instanceof Date ? value.toISOString() : value)
+    @ToISOString()
     updatedAt: string;
 
 

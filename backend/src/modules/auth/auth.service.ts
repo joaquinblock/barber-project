@@ -2,23 +2,19 @@ import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/c
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
-import { BarbershopService } from '../barbershop/barbershop.service';
+import { BusinessService } from '../business/business.service';
 import { LoginDto } from './dto/login.dto';
-import { LoginResponseDTO, User as SharedUser } from '@barber/shared/types';
-import { UserRole } from '@barber/shared/types';
-import { plainToInstance } from 'class-transformer';
-import { BarberUserDto } from '../barbers/dto/barber-user.dto';
-import { CustomerUserDto } from '../customers/dto/customer-user.dto';
-import { AdminUserDto } from '../users/dto/admin-user.dto';
+import { LoginResponseDTO, AuthResponseDTO, User, UserResponseDTO} from '@business/shared/types';
+import { UserRole } from '@business/shared/types';
 import { Logger } from '@nestjs/common';
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly usersService: UsersService,
-    private readonly barbershopService: BarbershopService,
+    private readonly businessService: BusinessService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -27,10 +23,16 @@ export class AuthService {
 
     this.logger.log(`Login attempt for user: ${email}`);
 
-    // 1. Validar Barbería
-    const barbershop = await this.barbershopService.findOneBySlug(slug);
+    // 1. Validar Negocio
+    const business = await this.businessService.findOneBySlug(slug);
+    if (!business) {
+      throw new UnauthorizedException({
+        code: ErrorCode.AUTH_INVALID_SLUG,
+        message: 'No se encontró un negocio con ese slug',
+      });
+    }
     // 2. Validar Usuario
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findPrivateByEmail(email);
     if (!user) {
       throw new UnauthorizedException({
         code: ErrorCode.AUTH_USER_NOT_FOUND,
@@ -47,17 +49,6 @@ export class AuthService {
       });
     }
 
-    // 4. Validar Pertenencia y Roles
-    // El rol CUSTOMER es global, pero BARBER debe pertenecer a la barbería del slug
-    if (user.roles.includes(UserRole.BARBER)) {
-      if (!user.barber || user.barber.barbershopId !== barbershop.id) {
-        throw new ForbiddenException({
-          code: ErrorCode.AUTH_FORBIDDEN,
-          message: 'No tenés permiso para acceder a esta barbería como barbero',
-        });
-      }
-    }
-
     this.logger.log(`User ${user.email} logged in successfully`);
 
     // 5. Generar Token
@@ -65,20 +56,20 @@ export class AuthService {
       sub: user.id, 
       email: user.email, 
       roles: user.roles,
-      barbershopId: barbershop.id 
+      businessId: business.id 
     };
 
     const token = this.jwtService.sign(payload);
 
     // 6. Preparar Respuesta mapeando al contrato compartido
     return {
-      user: this.mapUserToContract(user),
+      user: this.usersService.mapToResponse(user), 
       token,
-      barbershopId: barbershop.id,
+      businessId: business.id,
     };
   }
 
-  async verifyToken(token: string): Promise<any> {
+  async verifyToken(token: string): Promise<AuthResponseDTO> {
     try {
       const payload = this.jwtService.verify(token);
       const user = await this.usersService.findOneByEmail(payload.email);
@@ -88,8 +79,8 @@ export class AuthService {
       });
       
       return {
-        user: this.mapUserToContract(user),
-        barbershopId: payload.barbershopId,
+        user: user,
+        businessId: payload.businessId,
       };
     } catch (e) {
       throw new UnauthorizedException({
@@ -97,22 +88,5 @@ export class AuthService {
         message: 'Token inválido o expirado',
       });
     }
-  }
-
-  /**
-   * Mapea un usuario de la base de datos al contrato compartido User (BarberUser | CustomerUser | AdminUser).
-   * Utiliza plainToInstance con los DTOs de respuesta para asegurar que solo se expongan los campos necesarios.
-   */
-  private mapUserToContract(user: any): SharedUser {
-    if (user.roles.includes(UserRole.BARBER)) {
-      return plainToInstance(BarberUserDto, user, { excludeExtraneousValues: true });
-    }
-    
-    if (user.roles.includes(UserRole.CUSTOMER)) {
-      return plainToInstance(CustomerUserDto, user, { excludeExtraneousValues: true });
-    }
-
-    // Por defecto es AdminUser
-    return plainToInstance(AdminUserDto, user, { excludeExtraneousValues: true });
   }
 }

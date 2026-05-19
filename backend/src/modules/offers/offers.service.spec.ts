@@ -16,8 +16,8 @@ describe('OffersService', () => {
     title: 'Corte',
     price: 1500,
     duration: 30,
-    barberId: 'barber-1',
-    barbershopId: 'shop-1',
+    professionalId: 'professional-1',
+    businessId: 'shop-1',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -50,14 +50,14 @@ describe('OffersService', () => {
     jest.clearAllMocks();
   });
 
-  describe('findAllOffersByBarber', () => {
-    it('debería retornar un array de ofertas filtradas por barbero y barbería', async () => {
+  describe('findAllOffersByProfessional', () => {
+    it('debería retornar un array de ofertas filtradas por professionalo y professionalía', async () => {
       mockRepository.find.mockResolvedValue([mockOffer]);
 
-      const result = await service.findAllOffersByBarber('barber-1', 'shop-1');
+      const result = await service.findAllOffersByProfessional('professional-1', 'shop-1');
 
       expect(repository.find).toHaveBeenCalledWith({
-        where: { barberId: 'barber-1', barbershopId: 'shop-1' },
+        where: { professionalId: 'professional-1', businessId: 'shop-1' },
         order: { createdAt: 'DESC' },
       });
       expect(result).toHaveLength(1);
@@ -65,13 +65,13 @@ describe('OffersService', () => {
     });
   });
 
-  describe('createOfferByBarber', () => {
+  describe('createOfferByProfessional', () => {
     it('debería crear y guardar una nueva oferta', async () => {
       const dto: CreateOfferDto = { title: 'Corte', price: 1500, duration: 30, description: null };
       mockRepository.create.mockReturnValue(mockOffer);
       mockRepository.save.mockResolvedValue(mockOffer);
 
-      const result = await service.createOfferByBarber(dto, 'barber-1', 'shop-1');
+      const result = await service.createOfferByProfessional(dto, 'professional-1', 'shop-1');
 
       expect(repository.create).toHaveBeenCalledWith(dto);
       expect(repository.save).toHaveBeenCalled();
@@ -79,49 +79,49 @@ describe('OffersService', () => {
     });
   });
 
-  describe('updateOfferByBarber', () => {
-    it('debería actualizar una oferta si pertenece al barbero', async () => {
+  describe('updateOfferByProfessional', () => {
+    it('debería actualizar una oferta si pertenece al professionalo', async () => {
       const dto: UpdateOfferDto = { title: 'Corte Pro' };
       mockRepository.findOne.mockResolvedValue(mockOffer);
       mockRepository.merge.mockReturnValue({ ...mockOffer, ...dto });
       mockRepository.save.mockResolvedValue({ ...mockOffer, ...dto });
 
-      const result = await service.updateOfferByBarber('uuid-1', dto, 'barber-1', 'shop-1');
+      const result = await service.updateOfferByProfessional('uuid-1', dto, 'professional-1', 'shop-1');
 
       expect(repository.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid-1', barberId: 'barber-1', barbershopId: 'shop-1' },
+        where: { id: 'uuid-1', professionalId: 'professional-1', businessId: 'shop-1' },
       });
       expect(repository.save).toHaveBeenCalled();
       expect(result.title).toBe('Corte Pro');
     });
 
-    it('debería lanzar NotFoundException si la oferta no existe o no pertenece al barbero', async () => {
+    it('debería lanzar NotFoundException si la oferta no existe o no pertenece al professionalo', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.updateOfferByBarber('invalid-id', {}, 'barber-1', 'shop-1')
+        service.updateOfferByProfessional('invalid-id', {}, 'professional-1', 'shop-1')
       ).rejects.toThrow(NotFoundException);
     });
   });
 
-  describe('removeOfferByBarber', () => {
-    it('debería eliminar una oferta si pertenece al barbero', async () => {
+  describe('removeOfferByProfessional', () => {
+    it('debería eliminar una oferta si pertenece al professionalo', async () => {
       mockRepository.findOne.mockResolvedValue(mockOffer);
       mockRepository.remove.mockResolvedValue(mockOffer);
 
-      await service.removeOfferByBarber('uuid-1', 'barber-1', 'shop-1');
+      await service.removeOfferByProfessional('uuid-1', 'professional-1', 'shop-1');
 
       expect(repository.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid-1', barberId: 'barber-1', barbershopId: 'shop-1' },
+        where: { id: 'uuid-1', professionalId: 'professional-1', businessId: 'shop-1' },
       });
       expect(repository.remove).toHaveBeenCalledWith(mockOffer);
     });
 
-    it('debería lanzar NotFoundException si la oferta no existe para ese barbero', async () => {
+    it('debería lanzar NotFoundException si la oferta no existe para ese professionalo', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.removeOfferByBarber('uuid-1', 'barber-1', 'shop-1')
+        service.removeOfferByProfessional('uuid-1', 'professional-1', 'shop-1')
       ).rejects.toThrow(NotFoundException);
     });
   });

@@ -1,31 +1,33 @@
-import type { Service } from "@/shared/types";
 import styles from "./booking-service.module.css";
 import { List } from "@/shared/components/ui/List/List";
 import { Card } from "@/shared/components/ui/Card/Card";
 import { formatPrice } from "@/shared/utils/price-utils";
+import type { OfferResponseDTO } from "@business/shared/types";
 
 type BookingServiceProps = {
-  services: Service[];
-  selectedService?: Service | null;
-  onSelectService: (service: Service) => void;
+  offers: OfferResponseDTO[];
+  selectedOffer?: OfferResponseDTO | null;
+  onSelectOffer: (offer: OfferResponseDTO) => void;
 };
-export const BookingService = ({ services, selectedService, onSelectService }: BookingServiceProps) => {
+export const BookingService = ({ offers, selectedOffer, onSelectOffer }: BookingServiceProps) => {
   return (
     <div className={styles.serviceLayout}>
-      <List
-        items={services}
-        renderItem={(service) => (
-          <Card variant="selectable" onClick={() => onSelectService(service)} key={service.id} isActive={selectedService?.id === service.id}>
+      <List     
+        items={offers}
+        renderItem={(offer) => (
+          <div key={offer.id}>
+            <Card variant="selectable" onClick={() => onSelectOffer(offer)} key={offer.id} isActive={selectedOffer?.id === offer.id}>
             <div className={styles.cardContent}>
               <div className={styles.cardTitleDuration}>
-                <p className={styles.cardTitle}>{service.title}</p>
-                <p className={styles.cardDuration}> 60 minutos</p>
+                <p className={styles.cardTitle}>{offer.title}</p>
+                <p className={styles.cardDuration}> {offer.duration} minutos</p>
               </div>
               <div className={styles.cardPriceContainer}>
-                <p className={styles.cardPrice}>{formatPrice(service.price)}</p>
+                <p className={styles.cardPrice}>{formatPrice(offer.price)}</p>
               </div>
             </div>
           </Card>
+          </div>
         )}
         emptyComponent={<p>No hay servicios disponibles</p>}
       />

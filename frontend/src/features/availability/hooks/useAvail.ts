@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { AvailService } from "../services/avail.service";
 import { toWeeklyAvail } from "../utils/toWeeklyAvail.util";
-import type {CreateAvailRequestDTO, DayKey} from "@barber/shared/types";
+import type {CreateAvailRequestDTO, DayKey} from "@business/shared/types";
 import { toast } from "sonner";
-import { ErrorCode } from "@barber/shared/errors";
+import { ErrorCode } from "@business/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 
 // ---------------------------------------------------------

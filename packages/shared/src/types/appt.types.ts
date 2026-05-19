@@ -6,8 +6,8 @@ export type ApptDTO = {
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   type: ApptType;
-  barberId: string;
-  barbershopId: string;
+  professionalId: string;
+  businessId: string;
   customerId: string | null;
   offerId: string | null;
   reason: string | null;

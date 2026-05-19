@@ -20,9 +20,9 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["src/*"],
-      "@barber/shared": ["../packages/shared/src/index.ts"],
-      "@barber/shared/types": ["../packages/shared/src/types/index.ts"],
-      "@barber/shared/errors": ["../packages/shared/src/errors/index.ts"]
+      "@business/shared": ["../packages/shared/src/index.ts"],
+      "@business/shared/types": ["../packages/shared/src/types/index.ts"],
+      "@business/shared/errors": ["../packages/shared/src/errors/index.ts"]
     }
   }
 }

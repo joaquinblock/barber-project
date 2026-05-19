@@ -1,9 +1,9 @@
 import { Clock } from "lucide-react";
 import { useState } from "react";
 import styles from "./avail-manager.module.css";
-import { ErrorCode } from "@barber/shared/errors";
+import { ErrorCode } from "@business/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
-import type { DayKey, TimeRangeRequest} from "@barber/shared/types";
+import type { DayKey, TimeRangeRequest} from "@business/shared/types";
 import { DAYS_CONFIG } from "@/shared/constants/days";
 import { Suspense } from "react";
 import { toast } from "sonner";

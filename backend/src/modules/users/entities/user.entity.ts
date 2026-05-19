@@ -1,11 +1,13 @@
-import { Barber } from '../../barbers/entities/barber.entity';
+import { Professional } from '../../professionals/entities/professional.entity';
 import { 
   Column, 
+  CreateDateColumn, 
   Entity, 
   OneToOne, 
-  PrimaryGeneratedColumn 
+  PrimaryGeneratedColumn, 
+  UpdateDateColumn
 } from 'typeorm';
-import { UserRole } from '@barber/shared/types';
+import { UserRole } from '@business/shared/types';
 import { Customer } from '@/modules/customers/entities/customer.entity';
 import { Exclude } from 'class-transformer';
 
@@ -26,7 +28,7 @@ export class User {
     type: 'varchar',
     name: 'phone_number',  
     nullable: true })
-  phone?: string | null; // Vital para n8n
+  phone!: string | null; // Vital para n8n
 
   @Column()
   fullName!: string;
@@ -38,21 +40,28 @@ export class User {
   isActive!: boolean;
 
   @Column({ 
-    type: 'enum', 
-    enum: UserRole,
+    type: 'text', //no lo ponemos como enum porque es mas flexible para futuras expansiones
     array: true, 
-    default: [UserRole.CUSTOMER] })
+    default: '{CUSTOMER}' //formato que acepta postgres para arrays: {ELEMENTO1, ELEMENTO2}
+  })
   roles!: UserRole[]; //Importante para los guards y login
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
 
   // --- RELACIONES ---
 
-  //Si el usuario es un barbero, tendra una relacion 1 a 1 con la entidad Barber. Si no es barbero, esta propiedad será null.
-  @OneToOne(() => Barber, (barber) => barber.user)
-  barber?: Barber;
+
+  //Si el usuario es un professional, tendra una relacion 1 a 1 con la entidad Professional. Si no es professional, esta propiedad será null.
+  @OneToOne(() => Professional, (professional) => professional.user)
+  professional?: Professional;
 
   //Si el usuario es un cliente, tendra una relacion 1 a 1 con la entidad Customer. Si no es cliente, esta propiedad será null.
   @OneToOne(() => Customer, (customer) => customer.user)
   customer?: Customer;
 
-  //Nunca las relaciones barber y customer van a existir al mismo tiempo para un mismo usuario, porque un usuario no puede ser barbero y cliente a la vez. Esto se maneja desde la lógica de negocio al crear el usuario.
+  //Nunca las relaciones professional y customer van a existir al mismo tiempo para un mismo usuario, porque un usuario no puede ser professionalo y cliente a la vez. Esto se maneja desde la lógica de negocio al crear el usuario.
 }

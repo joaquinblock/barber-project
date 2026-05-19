@@ -6,7 +6,7 @@ import { CreateExceptionRangeDto } from './dto/create-exception-range.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Exception } from './entities/exception.entity';
 import { Repository } from 'typeorm';
-import { ExceptionResponseDTO } from '@barber/shared';
+import { ExceptionResponseDTO } from '@business/shared';
 import { plainToInstance } from 'class-transformer';
 import { ExceptionResponseDto } from './dto/exception-response.dto';
 import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
@@ -18,22 +18,22 @@ export class ExceptionsService {
     private readonly exceptionsRepository: Repository<Exception>,
   ) {}
 
-  async findAllExceptionsByBarber(barbershopId: string, barberId: string): Promise<ExceptionResponseDTO[]> {
+  async findAllExceptionsByProfessional(businessId: string, professionalId: string): Promise<ExceptionResponseDTO[]> {
     const exceptions = await this.exceptionsRepository.find({
       where: {
-        barbershopId,
-        barberId,
+        businessId,
+        professionalId,
       },
     });
     return plainToInstance(ExceptionResponseDto, exceptions, { excludeExtraneousValues: true });
   }
 
-  async createExceptionFullDay(dto: CreateExceptionFullDayDto, barbershopId: string, barberId: string): Promise<ExceptionResponseDTO> {
+  async createExceptionFullDay(dto: CreateExceptionFullDayDto, businessId: string, professionalId: string): Promise<ExceptionResponseDTO> {
     const exception = this.exceptionsRepository.create({
       ...dto,
       endDate: dto.startDate,
-      barbershopId,
-      barberId,
+      businessId,
+      professionalId,
     });
     try {
       const savedException = await this.exceptionsRepository.save(exception);
@@ -44,11 +44,11 @@ export class ExceptionsService {
     }  
   }
 
-  async createExceptionRange(dto: CreateExceptionRangeDto, barbershopId: string, barberId: string): Promise<ExceptionResponseDTO> {
+  async createExceptionRange(dto: CreateExceptionRangeDto, businessId: string, professionalId: string): Promise<ExceptionResponseDTO> {
     const exception = this.exceptionsRepository.create({
       ...dto,
-      barbershopId,
-      barberId,
+      businessId,
+      professionalId,
     });
     try {
       const savedException = await this.exceptionsRepository.save(exception);
@@ -59,13 +59,13 @@ export class ExceptionsService {
     }  
   }
 
-  async deleteException(id: string, barbershopId: string, barberId: string): Promise<void> {
+  async deleteException(id: string, businessId: string, professionalId: string): Promise<void> {
     try {
       const exception = await this.exceptionsRepository.findOne({
         where: {
           id,
-          barbershopId,
-          barberId,
+          businessId,
+          professionalId,
         },
       });
 

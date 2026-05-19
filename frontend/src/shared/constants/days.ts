@@ -1,11 +1,11 @@
-import type { Day, DayKey, DayName } from "@barber/shared/types";
+import type { Day, DayKey, DayName } from "@business/shared/types";
 
-export const DAYS_CONFIG: Record<DayKey, { letter: Day, full: DayName }> = {
-  MON: { letter: 'L', full: 'Lunes' },
-  TUE: { letter: 'M', full: 'Martes' },
-  WED: { letter: 'X', full: 'Miércoles' },
-  THU: { letter: 'J', full: 'Jueves' },
-  FRI: { letter: 'V', full: 'Viernes' },
-  SAT: { letter: 'S', full: 'Sábado' },
-  SUN: { letter: 'D', full: 'Domingo' },
+export const DAYS_CONFIG: Record<DayKey, { letter: Day, full: DayName, short: string }> = {
+  MON: { letter: 'L', full: 'Lunes', short: 'Lun' },
+  TUE: { letter: 'M', full: 'Martes', short: 'Mar' },
+  WED: { letter: 'X', full: 'Miércoles', short: 'Mié' },
+  THU: { letter: 'J', full: 'Jueves', short: 'Jue' },
+  FRI: { letter: 'V', full: 'Viernes', short: 'Vie' },
+  SAT: { letter: 'S', full: 'Sábado', short: 'Sáb' },
+  SUN: { letter: 'D', full: 'Domingo', short: 'Dom' },
 };

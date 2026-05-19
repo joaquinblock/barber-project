@@ -32,11 +32,11 @@ export class CreateApptDto {
 
   @Trim()
   @IsNotEmpty()
-  @IsUUID('4', { message: 'El ID del barbero debe ser un UUID válido' })
-  barberId!: string;
+  @IsUUID('4', { message: 'El ID del professionalo debe ser un UUID válido' })
+  professionalId!: string;
 
   @Trim()
   @IsNotEmpty()
-  @IsUUID('4', { message: 'El ID de la barbería debe ser un UUID válido' })
-  barbershopId!: string;
+  @IsUUID('4', { message: 'El ID de la professionalía debe ser un UUID válido' })
+  businessId!: string;
 }

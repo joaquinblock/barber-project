@@ -1,4 +1,4 @@
-import type { ErrorCode } from '@barber/shared/errors';
+import type { ErrorCode } from '@business/shared/errors';
 
 type Success<T> = {
   success: true;

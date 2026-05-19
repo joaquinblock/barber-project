@@ -8,12 +8,14 @@ type AlertProps = {
   children: ReactNode;
   day?: string; // "2026-03-17" ISO
   variant?: "default" | "warning" | "error";
+  onRetry?: () => void;
 };
 export const Alert = ({
   iconLeft: IconLeft,
   children,
   day,
   variant = "default",
+  onRetry,
 }: AlertProps) => {
   const alertClasses = clsx(
     styles.alertContainer,
@@ -50,6 +52,16 @@ export const Alert = ({
       <div className={alertTextClasses}>
         {children} {day && <strong>{day}</strong>}
       </div>
+      {onRetry && (
+        <button 
+          className={styles.retryButton} 
+          onClick={onRetry} 
+          type="button"
+          aria-label="Reintentar operación"
+        >
+          Reintentar
+        </button>
+      )}
     </div>
   );
 };

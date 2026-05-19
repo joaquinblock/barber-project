@@ -1,5 +1,5 @@
-import { ApiError } from '@barber/shared/errors';
-import type { ErrorCode } from '@barber/shared/errors';
+import { ApiError } from '@business/shared/errors';
+import type { ErrorCode } from '@business/shared/errors';
 
 export class AuthError extends ApiError {
   constructor(code: ErrorCode, message?: string) {

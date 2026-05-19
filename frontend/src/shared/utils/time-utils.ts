@@ -1,7 +1,15 @@
 import { format, parseISO, parse, addMinutes, isBefore  } from 'date-fns';
+import { DAYS_CONFIG } from '@/shared/constants/days';
 import { es } from 'date-fns/locale';
-import type  { DayKey, ErrorCode, TimeRange, DateKey, ApptsByDay, Appt} from '@/shared/types';
-import type { HourString } from "@/shared/types";
+import type { 
+  DayKey, 
+  DateKey, 
+  HourString, 
+  TimeRangeRequest as TimeRange 
+} from '@business/shared';
+import { ErrorCode } from '@business/shared/errors';
+import type { ApptsByDay, Appt } from '@/shared/types';
+
 /**
  * FORMATEO: De Objeto/ISO a Key de búsqueda (yyyy-MM-dd)
  */
@@ -11,19 +19,19 @@ export const formatDateToKey = (date: Date | DateKey): DateKey => {
 };
 
 /**
- * Convierte "2026-03-21" -> "S" (DayKey)
+ * Convierte "2026-03-21" -> "SAT" (DayKey)
  * 
- * Es para buscar el dia "L" en el JSON de Availability a partir de una fecha. 
+ * Es para buscar el dia "MON" en el JSON de Availability a partir de una fecha. 
  */
-// export const formatDateToDayKey = (dateStr: DateKey): DayKey => {
-//   // Separamos la fecha para evitar problemas de zona horaria
-//   const [year, month, day] = dateStr.split("-").map(Number);
-//   const date = new Date(year, month - 1, day);
+export const formatDateToDayKey = (dateStr: DateKey): DayKey => {
+  // Separamos la fecha para evitar problemas de zona horaria
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
   
-//   // Mapa de días que machea con tus constantes de Disponibilidad
-//   const map: DayKey[] = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-//   return map[date.getDay()];
-// };
+  // Mapa de días que machea con tus constantes de Disponibilidad (MON, TUE, etc)
+  const map: DayKey[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  return map[date.getDay()];
+};
 
 
 /**
@@ -34,13 +42,46 @@ export const formatDateToDisplay = (date: Date | DateKey): string => {
   return format(dateObj, "EEEE, d 'de' MMMM", { locale: es });
 };
 
+/**
+ * DISPLAY: Para Excepciones. Convierte DateKey (YYYY-MM-DD) a "Jue 14 May" o rango "14 - 20 May" o "14 May - 2 Jun"
+ */
+export const formatExceptionDisplayDate = (startDate: string, endDate?: string): string => {
+  // Importamos DAYS_CONFIG dinámicamente o lo importamos arriba (lo importaré arriba)
+  const startObj = typeof startDate === "string" ? parseISO(startDate) : startDate;
+  const startDayKey = formatDateToDayKey(startDate as DateKey);
+  const startShortDay = DAYS_CONFIG[startDayKey].short;
+  
+  const getShortMonth = (date: Date) => {
+    const m = format(date, 'MMM', { locale: es });
+    // remover el punto final que suele agregar date-fns locale es (ej: "may." -> "may")
+    const mClean = m.replace('.', '');
+    return mClean.charAt(0).toUpperCase() + mClean.slice(1);
+  };
+  
+  const startDay = format(startObj, 'd');
+  const startMonth = getShortMonth(startObj);
+
+  if (!endDate) {
+    return `${startShortDay} ${startDay} ${startMonth}`;
+  }
+
+  const endObj = typeof endDate === "string" ? parseISO(endDate) : endDate;
+  const endDay = format(endObj, 'd');
+  const endMonth = getShortMonth(endObj);
+
+  if (startMonth === endMonth) {
+    return `${startDay} - ${endDay} ${startMonth}`;
+  } else {
+    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+  }
+};
 
 /**
  * VALIDACIÓN UI: ¿Es coherente el rango?
  */
 export const validateBasicTimeRange = (range: TimeRange): ErrorCode | null => {
-  if (!range.startTime || !range.endTime) return 'REQUIRED_FIELDS';
-  if (range.startTime >= range.endTime) return 'INVALID_RANGE';
+  if (!range.startTime || !range.endTime) return ErrorCode.REQUIRED_FIELDS;
+  if (range.startTime >= range.endTime) return ErrorCode.INVALID_RANGE;
   return null;
 };
 

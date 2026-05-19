@@ -5,12 +5,19 @@ export const ROUTES_PATH = {
     REGISTER: '/:slug/register',
   },
   ADMIN: {
-    ROOT: '/employee',
-    SCHEDULE: 'schedule', // Sin barra porque es hija
-    CONFIG: 'barber-config',
+    ROOT: '/admin',
+    TEAM: 'team',
   },
-  EMPLOYEE: {
-    DASHBOARD: '/employee/dashboard',
+  ADMIN_PROFESSIONAL: {
+    ROOT: '/admin-pro',
+    SCHEDULE: 'schedule',
+    MODALITY: 'modality',
+    TEAM: 'team',
+  },
+  PROFESSIONAL: {
+    ROOT: '/pro',
+    SCHEDULE: 'schedule',
+    MODALITY: 'modality',
   },
   CUSTOMER: {
     DASHBOARD: '/booking',

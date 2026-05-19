@@ -2,6 +2,8 @@ export const ErrorCode = {
   // ── Genéricos ──────────────────────────────────────────────────────────────
    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
    RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+   REQUIRED_FIELDS: 'REQUIRED_FIELDS', //400 - el campo es obligatorio
+   INVALID_RANGE: 'INVALID_RANGE', //400 - el rango es invalido
 
    //Errores del servidor (5xx)
    SERVER_ERROR: 'SERVER_ERROR', //500 - error interno del servidor
@@ -25,6 +27,7 @@ export const ErrorCode = {
   DB_UNKNOWN_ERROR: 'DB_UNKNOWN_ERROR',
 
   // ── Auth ───────────────────────────────────────────────────────────────────
+  AUTH_INVALID_SLUG: 'AUTH_INVALID_SLUG',
   AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
   AUTH_USER_NOT_FOUND: 'AUTH_USER_NOT_FOUND',
   AUTH_FORBIDDEN: 'AUTH_FORBIDDEN',
@@ -38,9 +41,9 @@ export const ErrorCode = {
   AVAIL_OVERLAP: 'AVAIL_OVERLAP',
   AVAIL_NOT_FOUND: 'AVAIL_NOT_FOUND',
 
-  // ── Barber / Barbershop ────────────────────────────────────────────────────
-  BARBER_NOT_FOUND: 'BARBER_NOT_FOUND',
-  BARBERSHOP_NOT_FOUND: 'BARBERSHOP_NOT_FOUND',
+  // ── Professional / Business ────────────────────────────────────────────────────
+  PROFESSIONAL_NOT_FOUND: 'PROFESSIONAL_NOT_FOUND',
+  BUSINESS_NOT_FOUND: 'BUSINESS_NOT_FOUND',
 
   // ── Appointments (lógica frontend) ─────────────────────────────────────────
   APPT_BLOCK_OVERLAP_BLOCK: 'APPT_BLOCK_OVERLAP_BLOCK',

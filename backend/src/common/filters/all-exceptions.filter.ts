@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

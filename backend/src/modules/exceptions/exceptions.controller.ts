@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } f
 import { ExceptionsService } from './exceptions.service';
 import { CreateExceptionRangeDto } from './dto/create-exception-range.dto';
 import { CreateExceptionFullDayDto } from './dto/create-exception-full-day.dto';
-import { ExceptionResponseDTO } from '@barber/shared';
+import { ExceptionResponseDTO } from '@business/shared';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
-import { UserRole } from '@barber/shared/types';
+import { UserRole } from '@business/shared/types';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { GetBarber } from '@/common/decorators/get-barber.decorator';
+import { GetProfessional } from '@/common/decorators/get-professional.decorator';
 
 @Controller('exceptions')
 @UseGuards(AuthGuard, RolesGuard)
@@ -15,37 +15,37 @@ export class ExceptionsController {
   constructor(private readonly exceptionsService: ExceptionsService) {}
 
   @Get('me')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   async getMyExceptions(
-    @GetBarber() barber: { barberId: string, barbershopId: string },
+    @GetProfessional() professional: { professionalId: string, businessId: string },
   ): Promise<ExceptionResponseDTO[]> {
-    return this.exceptionsService.findAllExceptionsByBarber(barber.barbershopId, barber.barberId);
+    return this.exceptionsService.findAllExceptionsByProfessional(professional.businessId, professional.professionalId);
   }
 
   @Post('full-day')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   createFullDay(
     @Body() createFullDayDto: CreateExceptionFullDayDto,
-    @GetBarber() barber: { barberId: string, barbershopId: string },
+    @GetProfessional() professional: { professionalId: string, businessId: string },
   ) {
-    return this.exceptionsService.createExceptionFullDay(createFullDayDto, barber.barbershopId, barber.barberId);
+    return this.exceptionsService.createExceptionFullDay(createFullDayDto, professional.businessId, professional.professionalId);
   }
 
   @Post('range')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   createRange(
     @Body() createRangeDto: CreateExceptionRangeDto,
-    @GetBarber() barber: { barberId: string, barbershopId: string },
+    @GetProfessional() professional: { professionalId: string, businessId: string },
   ) {
-    return this.exceptionsService.createExceptionRange(createRangeDto, barber.barbershopId, barber.barberId);
+    return this.exceptionsService.createExceptionRange(createRangeDto, professional.businessId, professional.professionalId);
   }
 
   @Delete(':id')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   async deleteException(
     @Param('id') id: string,
-    @GetBarber() barber: { barberId: string, barbershopId: string },
+    @GetProfessional() professional: { professionalId: string, businessId: string },
   ): Promise<void> {
-    return this.exceptionsService.deleteException(id, barber.barbershopId, barber.barberId);
+    return this.exceptionsService.deleteException(id, professional.businessId, professional.professionalId);
   }
 }

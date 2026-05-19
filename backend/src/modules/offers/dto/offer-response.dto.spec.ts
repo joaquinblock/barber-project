@@ -11,8 +11,8 @@ describe('OfferResponseDto', () => {
     isActive: true,
     createdAt: new Date('2023-01-01T10:00:00Z'),
     updatedAt: new Date('2023-01-01T11:00:00Z'),
-    barberId: 'barber-1',
-    barbershopId: 'shop-1',
+    professionalId: 'professional-1',
+    businessId: 'shop-1',
     internalField: 'secret', // Debe ser excluido
   };
 

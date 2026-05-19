@@ -1,4 +1,4 @@
-import { HttpError, ApiError, ErrorCode } from "@barber/shared/errors";
+import { HttpError, ApiError, ErrorCode } from "@business/shared/errors";
 import { AUTH_STORAGE_KEYS } from "../../auth/constants/auth.constants";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
 
@@ -87,6 +87,13 @@ const request = async <T>(
     const code = body.error?.code ?? ErrorCode.SERVER_ERROR;
     const message = body.error?.message ?? "Error en la petición al servidor";
     
+    // Si la sesión expiró o no está autorizado, limpiamos y redirigimos
+    if (response.status === 401 || code === ErrorCode.AUTH_SESSION_EXPIRED || code === ErrorCode.UNAUTHORIZED) {
+      Object.values(AUTH_STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+      window.location.href = "/login";
+      return undefined as never; // Detener flujo
+    }
+
     if (code) {
       throw new ApiError(code, message); // backend procesó el error, tiene code semántico
     }

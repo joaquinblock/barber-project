@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ExclusionService } from "../services/exclusion.service";
-import { HttpError } from "@barber/shared";
+import { handleMutationError } from "@/shared/utils/error.utils";
 import { toast } from "sonner";
 
 export const useGetExclusions = () => {
-  const {data: exceptions, isLoading, isError, error} = useQuery({
+  const {data: exceptions, isLoading, isError, error, refetch} = useQuery({
     queryKey: ["exceptions"],
     queryFn: async () => ExclusionService.getByBarber(),
   });
 
-  return { exceptions, isLoading, isError, error };
+  return { exceptions, isLoading, isError, error, refetch };
 }
 
 export const useCreateFullDayException = () => {
@@ -20,13 +20,7 @@ export const useCreateFullDayException = () => {
       queryClient.invalidateQueries({ queryKey: ["exceptions"] });
       toast.success("Excepción agregada correctamente.");
     },
-    onError: (error: unknown) => {
-      if (error instanceof HttpError) {
-         toast.error(error.message);
-      } else {
-        toast.error("Error al agregar la excepción.");
-      }
-    }
+    // El error se maneja en el componente con un Alert
   });
   return mutation;
 }
@@ -39,13 +33,7 @@ export const useCreateRangeException = () => {
       queryClient.invalidateQueries({ queryKey: ["exceptions"] });
       toast.success("Excepción agregada correctamente.");
     },
-    onError: (error: unknown) => {
-      if (error instanceof HttpError) {
-         toast.error(error.message);
-      } else {
-        toast.error("Error al agregar la excepción.");
-      }
-    }
+    // El error se maneja en el componente con un Alert
   });
   return mutation;
 }
@@ -58,13 +46,7 @@ export const useDeleteException = () => {
       queryClient.invalidateQueries({ queryKey: ["exceptions"] });
       toast.success("Excepción eliminada correctamente.");
     },
-    onError: (error: unknown) => {
-      if (error instanceof HttpError) {
-        toast.error(error.message);
-      } else {
-        toast.error("Error al eliminar la excepción.");
-      }
-    }
+    onError: handleMutationError, // Delete usa Toast automático
   });
   return mutation;
 }

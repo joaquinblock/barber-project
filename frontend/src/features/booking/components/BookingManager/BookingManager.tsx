@@ -5,31 +5,23 @@ import { BookingService } from "../BookingService/BookingService";
 import { BookingTime } from "../BookingTime/BookingTime";
 import { Button, FeatureErrorBoundary } from "@/shared/components/ui";
 import styles from "./booking-manager.module.css";
-import type { useBarberConfig } from "@/shared/hooks/useBarberConfig";
-import type { Exception, Service } from "@/shared/types/barber-config";
-import type { DateKey, HourString } from "@/shared/types/time";
 import { formatDateToDayKey, formatDateToKey, groupApptsByDay } from "@/shared/utils/time-utils";
-import type { Appt} from "@/shared/types";
+import { useGetOffers } from "@/features/offers";
+import type { DateKey, HourString, OfferResponseDTO } from "@business/shared";
 
-type BookingManagerProps = {
-  appts: Appt[]; // Todos los appts, el componente se encarga de agruparlos por día y pasarlos filtrados a BookingTime
-  barberConfig: ReturnType<typeof useBarberConfig>;
-};
 
-const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => {
+const BookingManagerContent = () => {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
-  const services = barberConfig.services;
-  const availability = barberConfig.availability;
-  const exceptions = barberConfig.exceptions;
+  const { offers, isError, error} = useGetOffers();
 
   // === Servicio seleccionado ===
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedOffer, setSelectedOffer] = useState<OfferResponseDTO | null>(null);
 
-  const handleSelectService = (service: Service) => {
-    setSelectedService(service);
-    console.log("Servicio seleccionado:", service);
+  const handleSelectService = (offer: OfferResponseDTO) => {
+    setSelectedOffer(offer);
+    console.log("Servicio seleccionado:", offer);
   };
 
   // === Día seleccionado ===
@@ -49,35 +41,6 @@ const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => 
     setTimeSelected(time);
   }
 
-  // Se recalcula solo cuando cambia el array de appts
-  const apptsByDay = useMemo(() => groupApptsByDay(appts), [appts]);
-
-  // BookingTime solo recibe los appts del día que le importan
-  const dayAppts = daySelected ? (apptsByDay.get(daySelected) ?? []) : [];
-
-
-    // Lógica para desactivar botones según el paso y selección
-  // Paso 3: chequear si el día tiene excepción o no trabaja
-  let isDayBlocked = false;
-  let isWorking = true;
-  let exceptionForSelectedDay: Exception | undefined = undefined;
-  
-  if (step === 3 && daySelected) {
-    // Excepciones: buscar si el día está dentro de algún rango de excepción
-    const exception = exceptions.exceptions.find((ex) => {
-       return daySelected >= ex.startDate && daySelected <= ex.endDate;
-    });
-    
-    isDayBlocked = !!exception;
-    exceptionForSelectedDay = exception;
-    // Horario laboral
-    isWorking = !!availability.schedule[formatDateToDayKey(daySelected)]?.isWorking;
-  }
-
-  const isNextDisabled =
-    (step === 2 && !selectedService) ||
-    (step === 3 && (!daySelected || isDayBlocked || !isWorking)) ||
-    (step === 4 && !timeSelected);
 
 
   function renderStep() {
@@ -87,31 +50,29 @@ const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => 
       case 2:
         return (
           <BookingService
-            services={services.services}
-            selectedService={selectedService}
-            onSelectService={handleSelectService}
+            offers={offers}
+            selectedOffer={selectedOffer}
+            onSelectOffer={handleSelectService}
           ></BookingService>
         );
       case 3:
-        return (
-          <BookingDate
-            daySelected={daySelected}
-            onSelect={handleDaySelect}
-            isDayBlocked={isDayBlocked}
-            isWorking={isWorking}
-            exceptionForSelectedDay={exceptionForSelectedDay}
-          ></BookingDate>
+        return (<div>Hola</div>
+          // <BookingDate
+          //   daySelected={daySelected}
+          //   onSelect={handleDaySelect}
+          //   isDayBlocked={isDayBlocked}
+          //   isWorking={isWorking}
+          //   exceptionForSelectedDay={exceptionForSelectedDay}
+          // ></BookingDate>
         );
       case 4:
-        return (
-          //Exception no va porque el bloqueo se muestra en el paso anterior, entonces acá solo mostramos los horarios disponibles según el día seleccionado
-          <BookingTime
-            schedule={availability.schedule}
-            daySelected={daySelected}
-            selectedTime={timeSelected}
-            dayAppts={dayAppts}
-            onSelectTime={handleTimeSelect}
-          ></BookingTime>
+        return (<div>Hola</div>
+          //   schedule={availability.schedule}
+          //   daySelected={daySelected}
+          //   selectedTime={timeSelected}
+          //   dayAppts={dayAppts}
+          //   onSelectTime={handleTimeSelect}
+          // ></BookingTime>
         );
       default:
         return null;
@@ -138,13 +99,13 @@ const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => 
         {step < totalSteps && (
           <Button variant="primary"
             onClick={() => handleStep(step + 1)}
-            disabled={step === totalSteps || isNextDisabled}
+            disabled={step === totalSteps}
           >
             Siguiente
           </Button>
         )}
         {step === totalSteps && (
-          <Button variant="primary" onClick={() => alert("Reserva confirmada!")} disabled={isNextDisabled}>
+          <Button variant="primary" onClick={() => alert("Reserva confirmada!")} >
             Confirmar Reserva
           </Button>
         )}
@@ -153,10 +114,10 @@ const BookingManagerContent = ({ appts, barberConfig }: BookingManagerProps) => 
   );
 };
 
-export const BookingManager = (props: BookingManagerProps) => (
+export const BookingManager = () => (
   <FeatureErrorBoundary featureName="Booking">
     <Suspense fallback={<div>Cargando reserva...</div>}>
-      <BookingManagerContent {...props} />
+      <BookingManagerContent />
     </Suspense>
   </FeatureErrorBoundary>
 );

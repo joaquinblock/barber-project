@@ -1,4 +1,4 @@
-import type { DayKey, TimeRangeResponse } from '@barber/shared/types';
+import type { DayKey, TimeRangeResponse } from '@business/shared/types';
 
 /*export type DailyAvailability = {
     isWorking: boolean;

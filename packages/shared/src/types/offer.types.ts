@@ -10,8 +10,8 @@ export type OfferResponseDTO = CreateOfferDTO & {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  barberId: string;
-  barbershopId: string;
+  professionalId: string;
+  businessId: string;
 };
 
 export type UpdateOfferDTO = Partial<CreateOfferDTO>;

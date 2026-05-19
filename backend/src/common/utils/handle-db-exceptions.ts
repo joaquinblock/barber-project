@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PgPostError } from '@/common/enums/pg-post-error.enum';
 import { QueryFailedError } from 'typeorm';
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 
 type PostgresDriverError = {
 	code?: string;

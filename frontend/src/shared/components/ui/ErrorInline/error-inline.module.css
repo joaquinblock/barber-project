@@ -1,0 +1,14 @@
+.error-inline-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2, 8px);
+    color: var(--red-600);
+    font-size: var(--text-xs, 12px);
+    font-weight: var(--font-medium, 500);
+    margin-top: var(--spacing-2, 8px);
+    margin-bottom: var(--spacing-2, 8px);
+}
+
+.error-inline-icon {
+    color: var(--red-600);
+}

@@ -1,14 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { OfferService } from "../services/offer.service";
-import type { CreateOfferDTO, UpdateOfferDTO } from "@barber/shared/types";
+import type { CreateOfferDTO, UpdateOfferDTO } from "@business/shared/types";
 import { toast } from "sonner";
-import { ApiError, HttpError } from "@barber/shared/errors";
-
-const handleMutationError = (error: unknown) => {
-  if (error instanceof ApiError || error instanceof HttpError) {
-    toast.error(error.message);
-  }
-};
+import { handleMutationError } from "@/shared/utils/error.utils";
 
 /* ------------------------------------------
   GET - Hook para obtener ofertas
@@ -17,7 +11,7 @@ const handleMutationError = (error: unknown) => {
 export const useGetOffers = () => {
   const {data, isLoading, isError, error, refetch} = useQuery({
     queryKey: ["offers"],
-    queryFn: () => OfferService.getOffers(), //El error si hay lo agarra el try-catch del queryFn
+    queryFn: () => OfferService.getOffers(),
   });
 
   return {offers: data ?? [], isLoading, isError, error, refetch};
@@ -36,7 +30,7 @@ export const useCreateOffer = () => {
       queryClient.invalidateQueries({ queryKey: ["offers"] });
       toast.success("Oferta creada exitosamente");
     },
-    onError: handleMutationError,
+    // El error se maneja en el componente con un Alert
   });
 };
 
@@ -53,7 +47,7 @@ export const useUpdateOffer = () => {
       queryClient.invalidateQueries({ queryKey: ["offers"] });
       toast.success("Oferta actualizada exitosamente");
     },
-    onError: handleMutationError,
+    // El error se maneja en el componente con un Alert
   });
 };
 
@@ -70,6 +64,6 @@ export const useDeleteOffer = () => {
       queryClient.invalidateQueries({ queryKey: ["offers"] });
       toast.success("Oferta eliminada exitosamente");
     },
-    onError: handleMutationError,
+    onError: handleMutationError, // Delete usa Toast automático
   });
 };

@@ -1,4 +1,4 @@
-import { AvailResponseDTO as IAvailResponseDTO } from "@barber/shared/types";
+import { AvailResponseDTO as IAvailResponseDTO } from "@business/shared/types";
 import { Expose, Transform } from "class-transformer";
 import { DayOfWeek } from "@/common/enums/day-of-week.enum";
 
@@ -25,8 +25,8 @@ export class AvailResponseDto implements IAvailResponseDTO {
     updatedAt: string;
 
     @Expose()
-    barberId: string;
+    professionalId: string;
 
     @Expose()
-    barbershopId: string;
+    businessId: string;
 }

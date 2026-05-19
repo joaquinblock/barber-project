@@ -1,5 +1,5 @@
 import { api } from "@/core/api/utils/api.wrapper";
-import type { CreateAvailRequestDTO, AvailResponseDTO } from "@barber/shared/types";
+import type { CreateAvailRequestDTO, AvailResponseDTO } from "@business/shared/types";
 
 
 export class AvailService {

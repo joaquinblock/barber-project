@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -30,11 +30,11 @@ export class AuthGuard implements CanActivate {
       // Inyectamos el usuario completo en la request
       request.user = decoded.user;
       
-      // Mantenemos la compatibilidad con el decorador @GetBarber si es un barbero
-      if (decoded.user.barber) {
-        request.barber = {
-          barberId: decoded.user.barber.id,
-          barbershopId: decoded.user.barber.barbershopId,
+      // Mantenemos la compatibilidad con el decorador @GetProfessional si es un professionalo
+      if (decoded.user.professional) {
+        request.professional = {
+          professionalId: decoded.user.professional.id,
+          businessId: decoded.user.professional.businessId,
         };
       }
 

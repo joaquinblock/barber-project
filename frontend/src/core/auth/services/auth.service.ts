@@ -1,26 +1,20 @@
 import { api } from "../../api/utils/api.wrapper";
 import type { LoginCredentials } from "../types";
-import type { LoginResponseDTO } from "@barber/shared/types";
+import type { LoginResponseDTO, AuthResponseDTO } from "@business/shared/types";
 
-export const AuthService = {
+export class AuthService {
   /**
    * Realiza la petición de login al backend.
    * El backend recibirá email, password y slug.
    */
-  login: async ({ email, password }: LoginCredentials, slug: string): Promise<LoginResponseDTO> => {
-    // El wrapper 'api' ya maneja:
-    // - Base URL
-    // - Headers (Content-Type: application/json)
-    // - JSON stringify del body
-    // - Error handling (lanzando HttpError si success: false o !ok)
-    // - Unwrapping del body.data
+  static async login({ email, password }: LoginCredentials, slug: string): Promise<LoginResponseDTO> {
     return api.post<LoginResponseDTO>("/auth/login", { email, password, slug });
-  },
+  }
 
   /**
    * Valida el token actual y obtiene el perfil del usuario.
    */
-  getProfile: async (token: string): Promise<any> => {
-    return api.post<any>("/auth/profile", { token });
+  static async getProfile(token: string): Promise<AuthResponseDTO> {
+    return api.post<AuthResponseDTO>("/auth/profile", { token });
   }
-};
+}

@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsNumber, Min, MaxLength, IsInt, ValidateIf } from 'class-validator';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
-import { CreateOfferDTO } from '@barber/shared/types';
+import { CreateOfferDTO } from '@business/shared/types';
 
 export class CreateOfferDto implements CreateOfferDTO  {
   @Trim()

@@ -1,5 +1,5 @@
 import { api } from "@/core/api/utils/api.wrapper";
-import type { ExceptionResponseDTO } from "@barber/shared/types";
+import type { ExceptionResponseDTO } from "@business/shared/types";
 
 const EXCLUSION_ENDPOINT = "/exceptions";
 

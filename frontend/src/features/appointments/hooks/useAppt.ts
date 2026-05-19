@@ -3,7 +3,7 @@ import { findConflict } from "@/shared/utils/time-utils";
 import type {BanFormData} from "../types";
 import type { Appt, DateKey} from "@/shared/types";
 import type { OperationResult } from "@/shared/types";
-import { ErrorCode } from "@barber/shared/errors";
+import { ErrorCode } from "@business/shared/errors";
 
 //Usamos un DateKey para pedir por semana, en la base de datos las consultas son por semana
 

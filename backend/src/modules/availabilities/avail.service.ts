@@ -5,9 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Avail } from './entities/avail.entity';
 import { Repository, LessThan, MoreThan, Not } from 'typeorm';
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
-import { ErrorCode } from '@barber/shared/errors';
+import { ErrorCode } from '@business/shared/errors';
 import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
-import { AvailResponseDTO } from '@barber/shared';
+import { AvailResponseDTO } from '@business/shared';
 import { plainToInstance } from 'class-transformer';
 import { AvailResponseDto } from './dto/avail-response.dto';
 
@@ -19,20 +19,20 @@ export class AvailService {
   ) {}
 
   /**
-   * Crea una disponibilidad para un barbero
+   * Crea una disponibilidad para un professionalo
    * 
    * @param createAvailDto - Datos de la disponibilidad
-   * @param barber - Datos del barbero
+   * @param professional - Datos del professionalo
    * @returns Promise<Avail> - Disponibilidad creada
    */
-  async createAvailByBarber(createAvailDto: CreateAvailDto, barberId: string, barbershopId: string ): Promise<AvailResponseDTO> {
+  async createAvailByProfessional(createAvailDto: CreateAvailDto, professionalId: string, businessId: string ): Promise<AvailResponseDTO> {
     const { startTime, endTime, dayOfWeek } = createAvailDto;
 
     // Verificar si hay solapamiento: (nuevoStart < existenteEnd) AND (nuevoEnd > existenteStart)
     const overlapping = await this.availRepository.findOne({
       where: {
-        barberId,
-        barbershopId,
+        professionalId,
+        businessId,
         dayOfWeek,
         startTime: LessThan(endTime),
         endTime: MoreThan(startTime),
@@ -48,8 +48,8 @@ export class AvailService {
 
     const newAvail = this.availRepository.create({
       ...createAvailDto,
-      barberId,
-      barbershopId,
+      professionalId,
+      businessId,
     });
     try {
       const savedAvail = await this.availRepository.save(newAvail);
@@ -61,17 +61,17 @@ export class AvailService {
   }
 
   /**
-   * Busca todas las disponibilidades de un barbero
+   * Busca todas las disponibilidades de un professionalo
    * 
    * find() : Retorna un array de objetos que coinciden con la condición.
    * 
-   * @param barberId - ID del barbero
+   * @param professionalId - ID del professionalo
    * @returns Promise<Avail[]> - Lista de disponibilidades
    * 
    */
-  async findAllAvailsByBarber(barberId: string, barbershopId: string): Promise<AvailResponseDTO[]> {
+  async findAllAvailsByProfessional(professionalId: string, businessId: string): Promise<AvailResponseDTO[]> {
     const avails = await this.availRepository.find({
-      where: { barberId, barbershopId },
+      where: { professionalId, businessId },
       order: {
         dayOfWeek: 'ASC',
         startTime: 'ASC',
@@ -81,7 +81,7 @@ export class AvailService {
   }
 
   /**
-   * Actualiza un intervalo de disponibilidad para un barbero
+   * Actualiza un intervalo de disponibilidad para un professionalo
    * 
    * Object.assign() es un método de JavaScript que copia las propiedades del objeto de la derecha y la sobreescribe en el objeto de la izquierda.
    * findOne() : Retorna un objeto que coincide con la condición.
@@ -89,13 +89,13 @@ export class AvailService {
    * 
    * @param id - ID de la disponibilidad
    * @param updateAvailDto - Datos a actualizar
-   * @param barberId - ID del barbero
+   * @param professionalId - ID del professionalo
    * @returns Promise<Avail> - Disponibilidad actualizada
    * @throws NotFoundException - Si la disponibilidad no existe
    * @throws ConflictException - Si el horario se solapa con uno existente
    */
-  async updateAvailByBarber(id: string, updateAvailDto: UpdateAvailDto, barberId: string, barbershopId: string ): Promise<AvailResponseDTO> {
-    const avail = await this.availRepository.findOne({ where: { id, barberId, barbershopId } });
+  async updateAvailByProfessional(id: string, updateAvailDto: UpdateAvailDto, professionalId: string, businessId: string ): Promise<AvailResponseDTO> {
+    const avail = await this.availRepository.findOne({ where: { id, professionalId, businessId } });
     if (!avail) throw new NotFoundException({
       code: ErrorCode.AVAIL_NOT_FOUND,
       message: 'Disponibilidad no encontrada',
@@ -108,8 +108,8 @@ export class AvailService {
     // Verificar si hay solapamiento excluyendo el registro actual
     const overlapping = await this.availRepository.findOne({
       where: {
-        barberId,
-        barbershopId,
+        professionalId,
+        businessId,
         dayOfWeek,
         startTime: LessThan(endTime),
         endTime: MoreThan(startTime),
@@ -136,14 +136,14 @@ export class AvailService {
   }
 
   /**
-   * Elimina un intervalo de disponibilidad para un barbero
+   * Elimina un intervalo de disponibilidad para un professionalo
    * 
    * @param id - ID de la disponibilidad
-   * @param barberId - ID del barbero
+   * @param professionalId - ID del professionalo
    * @throws NotFoundException - Si la disponibilidad no existe
    */
-  async removeAvailByBarber(id: string, barberId: string, barbershopId: string ): Promise<void> {
-    const avail = await this.availRepository.findOne({ where: { id, barberId, barbershopId } });
+  async removeAvailByProfessional(id: string, professionalId: string, businessId: string ): Promise<void> {
+    const avail = await this.availRepository.findOne({ where: { id, professionalId, businessId } });
     if (!avail) throw new NotFoundException({
       code: ErrorCode.AVAIL_NOT_FOUND,
       message: 'Disponibilidad no encontrada',
@@ -157,16 +157,16 @@ export class AvailService {
   }
 
   /**
-   * Elimina todos los intervalos de disponibilidad para un día de la semana específico de un barbero
+   * Elimina todos los intervalos de disponibilidad para un día de la semana específico de un professionalo
    * 
    * Se hace con delete para que borre todos los intervalos que coincidan con el día de la semana, remove solo borra uno.
    * 
-   * @param barberId - ID del barbero
+   * @param professionalId - ID del professionalo
    * @param dayOfWeek - Día de la semana
    */
-  async removeAvailsByDay(dayOfWeek: DayOfWeek, barberId: string, barbershopId: string): Promise<void> {
+  async removeAvailsByDay(dayOfWeek: DayOfWeek, professionalId: string, businessId: string): Promise<void> {
     try {
-      await this.availRepository.delete({ dayOfWeek, barberId, barbershopId });
+      await this.availRepository.delete({ dayOfWeek, professionalId, businessId });
     } catch (error) {
       handleDbExceptions(error, 'availabilities');
       throw error;

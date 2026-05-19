@@ -1,5 +1,5 @@
 import { api } from "@/core/api/utils/api.wrapper";
-import type { CreateOfferDTO, UpdateOfferDTO, OfferResponseDTO } from "@barber/shared/types";
+import type { CreateOfferDTO, UpdateOfferDTO, OfferResponseDTO } from "@business/shared/types";
 
 export class OfferService {
   private static readonly OFFERS_ENDPOINT = "/offers";

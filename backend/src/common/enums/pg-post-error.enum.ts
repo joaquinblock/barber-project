@@ -14,8 +14,8 @@ export enum PgPostError {
 }
 
 /*
-  Deadlock: ocurre cuando por ejemplo A quiere sacar un turno y bloquea la tabla de turnos para escribir pero necesita leer Barbero para confirmar,
-  mientras que B quiere sacar un turno y bloquea la tabla de Barbero para escribir pero necesita leer Turnos para confirmar, entonces ambos procesos 
+  Deadlock: ocurre cuando por ejemplo A quiere sacar un turno y bloquea la tabla de turnos para escribir pero necesita leer Professionalo para confirmar,
+  mientras que B quiere sacar un turno y bloquea la tabla de Professionalo para escribir pero necesita leer Turnos para confirmar, entonces ambos procesos 
   quedan bloqueados esperando el uno al otro, lo que se conoce como un deadlock. 
   Cuando PostgreSQL detecta esta situación, lanza la excepción DEADLOCK_DETECTED para indicar que se ha producido un conflicto de concurrencia 
   y que una de las transacciones debe ser abortada para resolver el bloqueo. 

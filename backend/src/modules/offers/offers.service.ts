@@ -4,7 +4,7 @@ import { Offer } from './entities/offer.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { handleDbExceptions } from '@/common/utils/handle-db-exceptions';
-import { OfferResponseDTO } from '@barber/shared';
+import { OfferResponseDTO } from '@business/shared';
 import { OfferResponseDto } from './dto/offer-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -16,22 +16,22 @@ export class OffersService {
     private readonly offersRepository: Repository<Offer>
   ) {}
 
-  async findAllOffersByBarber(barbershopId: string, barberId: string): Promise<OfferResponseDTO[]> {
+  async findAllOffersByProfessional(businessId: string, professionalId: string): Promise<OfferResponseDTO[]> {
     const offers = await this.offersRepository.find({
-      where: { barberId, barbershopId },
+      where: { professionalId, businessId },
       order: {
         createdAt: 'DESC',
       }
     });
-    //SELECT * FROM offers WHERE barber_id = ? AND barbershop_id = ?;
+    //SELECT * FROM offers WHERE professional_id = ? AND business_id = ?;
     return plainToInstance(OfferResponseDto, offers, { excludeExtraneousValues: true });
   }
 
-  async createOfferByBarber(createOfferDto: CreateOfferDto, barbershopId: string, barberId: string): Promise<OfferResponseDTO> {
+  async createOfferByProfessional(createOfferDto: CreateOfferDto, businessId: string, professionalId: string): Promise<OfferResponseDTO> {
     const offer = this.offersRepository.create({
       ...createOfferDto,
-      barberId,
-      barbershopId
+      professionalId,
+      businessId
     });
 
     try {
@@ -43,11 +43,11 @@ export class OffersService {
     }  
   }
 
-  async updateOfferByBarber(id: string, updateOfferDto: UpdateOfferDto, barbershopId: string, barberId: string): Promise<OfferResponseDTO> {
+  async updateOfferByProfessional(id: string, updateOfferDto: UpdateOfferDto, businessId: string, professionalId: string): Promise<OfferResponseDTO> {
     const offer = await this.offersRepository.findOne({
-      where: { id, barberId, barbershopId },
+      where: { id, professionalId, businessId },
     });
-    //SELECT * FROM offers WHERE id = ? AND barber_id = ? AND barbershop_id = ?;
+    //SELECT * FROM offers WHERE id = ? AND professional_id = ? AND business_id = ?;
     if (!offer) {
       throw new NotFoundException(`Offer with id "${id}" not found`);
     }
@@ -61,16 +61,16 @@ export class OffersService {
     }  
   }
 
-  async removeOfferByBarber(id: string, barbershopId: string, barberId: string): Promise<void> {
+  async removeOfferByProfessional(id: string, businessId: string, professionalId: string): Promise<void> {
     const offer = await this.offersRepository.findOne({
-      where: { id, barberId, barbershopId },
+      where: { id, professionalId, businessId },
     });
-    //SELECT * FROM offers WHERE id = ? AND barber_id = ? AND barbershop_id = ?;
+    //SELECT * FROM offers WHERE id = ? AND professional_id = ? AND business_id = ?;
     if (!offer) {
       throw new NotFoundException(`Offer with id "${id}" not found`);
     }
     
     await this.offersRepository.remove(offer);
-    //DELETE FROM offers WHERE id = ? AND barber_id = ? AND barbershop_id = ?;
+    //DELETE FROM offers WHERE id = ? AND professional_id = ? AND business_id = ?;
   } 
 }

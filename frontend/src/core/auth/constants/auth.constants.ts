@@ -24,7 +24,7 @@ export const LOGIN_UI_TEXT = {
 
 export const AUTH_STORAGE_KEYS = {
   TOKEN: 'auth_token',
-  BARBERSHOP_ID: 'auth_barbershop_id',
+  BUSINESS_ID: 'auth_business_id',
   USER_ID: 'auth_user_id',
   USER: 'auth_user',
 } as const;

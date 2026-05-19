@@ -1,24 +1,53 @@
-import { Button, EmptyState, List, Modal, Panel, FeatureErrorBoundary } from "@/shared/components/ui";
-import type { CreateExceptionDTO, ExceptionResponseDTO } from "@barber/shared/types";
-import { Calendar, Plus } from "lucide-react";
+import { Button, EmptyState, List, Modal, Panel, FeatureErrorBoundary, Alert, ErrorInline } from "@/shared/components/ui";
+import { Calendar, Plus, AlertCircle } from "lucide-react";
 import styles from "./excl-manager.module.css";
 import { Suspense, useState } from "react";
 import { ExclCard, ExclModal } from "@/features/exceptions/components";
-import { useCreateFullDayException, useDeleteException, useGetExclusions } from "../../hooks/useExcl";
+import { useCreateFullDayException, useCreateRangeException, useDeleteException, useGetExclusions } from "../../hooks/useExcl";
+import { ApiError, HttpError, type CreateExceptionDTO} from "@business/shared";
 
 const ExclManagerContent = () => {
-
-  const { mutateAsync: createException } = useCreateFullDayException();
-  const { mutateAsync: deleteException } = useDeleteException();
-  const { exceptions, isLoading } = useGetExclusions();
-
-
+  const createFullDayMutation = useCreateFullDayException();
+  const createRangeMutation = useCreateRangeException();
+  const { mutate: deleteException } = useDeleteException();
+  const { exceptions, isLoading, isError, error, refetch } = useGetExclusions();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedException, setSelectedException] = useState<ExceptionResponseDTO | null>(null);
 
-  
+  // Determinar si hay algún error de creación (unificados para el Alert del Modal)
+  const mutationError = createFullDayMutation.error || createRangeMutation.error;
+  const isMutationError = createFullDayMutation.isError || createRangeMutation.isError;
+  const isMutationPending = createFullDayMutation.isPending || createRangeMutation.isPending;
+
+  if (isError) {
+    return (
+      <Alert variant="error" iconLeft={AlertCircle} onRetry={refetch}>
+        {error instanceof ApiError || error instanceof HttpError 
+          ? error?.message 
+          : "Error al cargar las exclusiones."}
+      </Alert>
+    );
+  }
+
+  const handleAddException = (data : CreateExceptionDTO) => {
+
+    const options = {
+      onSuccess: () => setIsModalOpen(false) 
+    };
+
+    if (data.type === 'range' && data.endDate) {
+      createRangeMutation.mutate({ 
+        startDate: data.startDate, 
+        endDate: data.endDate, 
+        reason: data.reason 
+      }, options);
+    } else {
+      createFullDayMutation.mutate({ 
+        startDate: data.startDate, 
+        reason: data.reason 
+      }, options);
+    }
+  }
 
   return (
     <>
@@ -47,7 +76,14 @@ const ExclManagerContent = () => {
         <Modal
           text="Agregar excepción" 
           onClose={() => setIsModalOpen(false)}>
-            <ExclModal onSave={handleAddException}></ExclModal>
+            {isMutationError && (
+              <ErrorInline iconLeft={AlertCircle}>
+                {mutationError instanceof ApiError || mutationError instanceof HttpError 
+                  ? mutationError.message 
+                  : "Ocurrió un error al guardar la excepción."}
+              </ErrorInline>
+            )}
+            <ExclModal onSave={handleAddException} isLoading={isMutationPending}></ExclModal>
         </Modal>}
     </>
   );

@@ -1,7 +1,7 @@
 import { Switch, Card, Button } from "@/shared/components/ui";
 import { useState } from "react";
 import styles from "./offer-card.module.css";
-import type { OfferResponseDTO } from "@barber/shared/types";
+import type { OfferResponseDTO } from "@business/shared/types";
 import { Clock, DollarSign, Pen,Trash2 } from "lucide-react";
 
 type ServiceCardProps = {

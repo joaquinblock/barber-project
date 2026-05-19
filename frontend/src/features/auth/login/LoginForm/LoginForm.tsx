@@ -1,4 +1,4 @@
-import { Input, Button, Alert } from '@/shared/components/ui';
+import { Input, Button, ErrorInline } from '@/shared/components/ui';
 import { Mail, Lock, AlertCircle } from 'lucide-react'; // Tus iconos
 import styles from './login-form.module.css';
 import { AuthLink } from '../../components/AuthLink/AuthLink';
@@ -43,9 +43,9 @@ export const LoginForm = ({onLogin, isLoading, errorMsg}: LoginFormProps) => {
           {isLoading ? <span className={styles.spinner}></span> : "Iniciar sesión"}
         </Button>
       {errorMsg && (
-        <Alert variant="error" iconLeft={AlertCircle}>
+        <ErrorInline iconLeft={AlertCircle}>
           {errorMsg}
-        </Alert>
+        </ErrorInline>
       )} {/* Muestra el mensaje de error si existe */}
       <AuthLink text="¿No tienes una cuenta?" linkText="Regístrate" to="/register" />
     </form>

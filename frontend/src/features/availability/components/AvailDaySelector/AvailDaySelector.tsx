@@ -1,4 +1,4 @@
-import type { DayKey} from '@barber/shared/types';
+import type { DayKey} from '@business/shared/types';
 import type { WeeklyAvailability } from '../../types';
 import styles from './avail-day-selector.module.css';
 import { DayButton } from '@/shared/components/ui';

@@ -7,12 +7,12 @@ import {
   Index,
   In,
 } from 'typeorm';
-import { Barber } from '@/modules/barbers/entities/barber.entity';
+import { Professional } from '@/modules/professionals/entities/professional.entity';
 import { Customer } from '@/modules/customers/entities/customer.entity';
 import { Offer } from '@/modules/offers/entities/offer.entity';
 import { ApptType } from '../enums/appt-type.enum';
 import { ApptStatus } from '../enums/appt-status.enum';
-import { Barbershop } from '@/modules/barbershop/entities/barbershop.entity';
+import { Business } from '@/modules/business/entities/business.entity';
 
 @Entity('appointments')
 
@@ -44,28 +44,28 @@ export class Appt {
   status!: ApptStatus;
 
   // --- RELACIONES ---
-  @Index() // Índice para optimizar consultas por barbero
-  @Column({ type: 'uuid', name: 'barber_id' })
-  barberId!: string;
+  @Index() // Índice para optimizar consultas por professionalo
+  @Column({ type: 'uuid', name: 'professional_id' })
+  professionalId!: string;
 
-  // Muchos turnos pertenecen a UN barbero
-  @ManyToOne(() => Barber, (barber) => barber.appointments, {
+  // Muchos turnos pertenecen a UN professionalo
+  @ManyToOne(() => Professional, (professional) => professional.appointments, {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'barber_id' })
-  barber!: Barber;
+  @JoinColumn({ name: 'professional_id' })
+  professional!: Professional;
 
   @Index()
-  @Column({ type: 'uuid', name: 'barbershop_id' })
-  barbershopId!: string;
+  @Column({ type: 'uuid', name: 'business_id' })
+  businessId!: string;
   
-  @ManyToOne(() => Barbershop, (barbershop) => barbershop.appointments, {
+  @ManyToOne(() => Business, (business) => business.appointments, {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'barbershop_id' })
-  barbershop!: Barbershop;
+  @JoinColumn({ name: 'business_id' })
+  business!: Business;
 
   @Column({ type: 'uuid', nullable: true, name: 'customer_id' })
   customerId?: string;

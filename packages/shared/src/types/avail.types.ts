@@ -11,8 +11,8 @@ export type AvailResponseDTO = {
   dayOfWeek: DayKey;
   startTime: string;
   endTime: string;
-  barberId: string;  
-  barbershopId: string;
+  professionalId: string;  
+  businessId: string;
   createdAt: string;
   updatedAt: string;
 };

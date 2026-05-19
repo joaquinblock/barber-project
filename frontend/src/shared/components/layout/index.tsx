@@ -1,1 +1,1 @@
-export {EmployeeNavBar} from './EmployeeNavBar/EmployeeNavBar';
+export { BusinessNavBar } from './BusinessNavBar/BusinessNavBar';

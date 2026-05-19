@@ -1,5 +1,5 @@
-import { Barber } from '@/modules/barbers/entities/barber.entity';
-import { Barbershop } from '@/modules/barbershop/entities/barbershop.entity';
+import { Professional } from '@/modules/professionals/entities/professional.entity';
+import { Business } from '@/modules/business/entities/business.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -52,19 +52,19 @@ export class Offer {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt!: Date;
 
-  @Index() // Índice para acelerar consultas por barberId
-  @Column({ type: 'uuid', name: 'barber_id' })
-  barberId!: string; // ID del barbero que ofrece este servicio, para consultas rápidas
+  @Index() // Índice para acelerar consultas por professionalId
+  @Column({ type: 'uuid', name: 'professional_id' })
+  professionalId!: string; // ID del professionalo que ofrece este servicio, para consultas rápidas
 
-  @ManyToOne(() => Barber, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barber_id' })
-  barber!: Barber;
+  @ManyToOne(() => Professional, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'professional_id' })
+  professional!: Professional;
 
     @Index()
-  @Column({ type: 'uuid', name: 'barbershop_id' })
-  barbershopId!: string;
+  @Column({ type: 'uuid', name: 'business_id' })
+  businessId!: string;
 
-  @ManyToOne(() => Barbershop, (barbershop) => barbershop.offers, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'barbershop_id' })
-  barbershop!: Barbershop;
+  @ManyToOne(() => Business, (business) => business.offers, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'business_id' })
+  business!: Business;
 }

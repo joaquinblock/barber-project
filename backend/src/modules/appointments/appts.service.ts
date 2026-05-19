@@ -16,11 +16,11 @@ export class ApptsService {
     return 'This action adds a new appointment';
   }
 
-  async findByBarber(barberId: string): Promise<Appt[]> {
+  async findByProfessional(professionalId: string): Promise<Appt[]> {
     return this.apptRepository.find({
-      where: { barberId },
+      where: { professionalId },
       relations: {
-        barber: true,
+        professional: true,
         customer: true,
         offer: true,
       },

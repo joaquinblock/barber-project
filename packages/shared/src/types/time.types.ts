@@ -18,4 +18,10 @@ export type TimeRangeResponse = TimeRangeRequest & {
     readonly id: string;
 };
 
+export type DateRange = {
+    readonly from: DateKey;
+    readonly to: DateKey | null;
+}
+
+
 

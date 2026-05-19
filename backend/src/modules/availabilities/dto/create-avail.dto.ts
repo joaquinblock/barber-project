@@ -9,7 +9,7 @@ import {
 import { DayOfWeek } from '@/common/enums/day-of-week.enum';
 import { IsValidInterval } from '@/common/helpers/validators/is-valid-interval.validator';
 import { Trim } from '@/common/helpers/transforms/trim.transform';
-import type { CreateAvailRequestDTO } from '@barber/shared/types';
+import type { CreateAvailRequestDTO } from '@business/shared/types';
 
 export class CreateAvailDto implements CreateAvailRequestDTO {
   @IsEnum(DayOfWeek, {
@@ -28,5 +28,5 @@ export class CreateAvailDto implements CreateAvailRequestDTO {
   @Matches(/^([01]\d|2[0-3]):?([0-5]\d)$/, { message: 'endTime debe ser HH:mm' })
   endTime!: string;
 
-  //No incluye barberId ni barbershopId porque los tomamos del token.
+  //No incluye professionalId ni businessId porque los tomamos del token.
 }

@@ -1,12 +1,11 @@
-import { List, Panel, FeatureErrorBoundary, EmptyState, Button, Modal, Input, Alert } from "@/shared/components/ui";
+import { List, Panel, FeatureErrorBoundary, EmptyState, Button, Modal, Input, Alert, ErrorInline } from "@/shared/components/ui";
 import { useGetOffers, useCreateOffer, useUpdateOffer, useDeleteOffer  } from "@/features/offers/hooks/useOffer";
 import { OfferServiceCard } from "../OfferServiceCard/OfferCard";
 import { Scissors, Plus, AlertCircle } from "lucide-react";
 import { Suspense, useState } from "react";
-import type { CreateOfferDTO} from "@barber/shared";
-import { ApiError, HttpError, ErrorCode } from "@barber/shared/errors";
+import type { CreateOfferDTO} from "@business/shared";
+import { ApiError, HttpError, ErrorCode } from "@business/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
-import { toast } from "sonner";
 
 //Es un tipo solo para manejar el formulario
 type OfferFormData = Omit<CreateOfferDTO, 'price' | 'duration'> & {
@@ -38,20 +37,21 @@ const validateOfferData = (data: { title: string; price: number; duration: numbe
 };
 
 const OfferManagerContent = () => {
-  const {offers} = useGetOffers();
-  const {mutate: createOffer, error: createOfferError, isError: isCreateOfferError, isSuccess: isCreateOfferSuccess} = useCreateOffer();
-  const {mutate: updateOffer} = useUpdateOffer();
+  const { offers, isError, error: getError, refetch } = useGetOffers();
+  const {mutate: createOffer, error: createOfferError, isError: isCreateOfferError, isPending: isCreateOfferPending} = useCreateOffer();
+  const {mutate: updateOffer, error: updateOfferError, isError: isUpdateOfferError, isPending: isUpdateOfferPending} = useUpdateOffer();
   const {mutate: deleteOffer} = useDeleteOffer();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  const initialData = { title: "", price: "", duration: "", description: "" };
   
-  const [formData, setFormData] = useState<OfferFormData>({ title: "", price: "", duration: "", description: "" });
+  const [formData, setFormData] = useState<OfferFormData>(initialData);
 
   const handleOpenCreateModal = () => {
     setIsEditing(false);
     setSelectedOfferId(null);
-    setFormData({ title: "", price: "", duration: "", description: "" });
+    setFormData(initialData);
     setIsModalOpen(true);
   }
 
@@ -79,8 +79,11 @@ const OfferManagerContent = () => {
     });
 
     if (validationError) {
-      toast.error(ERROR_MESSAGES[validationError] || ERROR_MESSAGES[ErrorCode.UNKNOWN_ERROR]);
-      return;
+      return (
+        <ErrorInline iconLeft={AlertCircle}>
+              {ERROR_MESSAGES[validationError] || ERROR_MESSAGES[ErrorCode.UNKNOWN_ERROR]}
+        </ErrorInline>
+      );
     }
 
     const finalOffer: CreateOfferDTO = {
@@ -128,17 +131,19 @@ const OfferManagerContent = () => {
     // Si queremos hacer algo en error a nivel UI se puede aquí, pero el toast ya lo manejó
   }
 
-  const { isError, error: getError } = useGetOffers();
-
   if (isError) {
     return (
-      <Alert variant="error" iconLeft={AlertCircle}>
+      <Alert variant="error" iconLeft={AlertCircle} onRetry={refetch}>
         {getError instanceof ApiError || getError instanceof HttpError 
           ? getError.message 
           : "Error al cargar los servicios."}
       </Alert>
     );
   }
+
+  const mutationError = isEditing ? updateOfferError : createOfferError;
+  const isMutationError = isEditing ? isUpdateOfferError : isCreateOfferError;
+  const isMutationPending = isEditing ? isUpdateOfferPending : isCreateOfferPending;
 
   return (
     <>
@@ -149,29 +154,26 @@ const OfferManagerContent = () => {
         button={
           <Button variant="primary" size="md" onClick={handleOpenCreateModal}><Plus size={16}/> Agregar </Button>
         }>
-      <List
-        items={offers}
-        renderItem={(service) => (
-          <OfferServiceCard 
-          key={service.id} 
-          service={service} 
-          onEdit={() => handleEditOffer(service.id)}
-          onDelete={() => handleDeleteOffer(service.id)}
-          onToggleActive={(id, isActive) => handleToggleActive(id, isActive)}
-          />
-        )}
-        emptyComponent={<EmptyState text="Aún no tienes servicios" />}
-      />
-    </Panel>
-    {isModalOpen && (
-      <Modal
-        onClose={() => setIsModalOpen(false)}
-        text={isEditing ? "Editar Servicio" : "Agregar Servicio"}
-      >
-        <form 
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
+        <List
+          items={offers}
+          renderItem={(service) => (
+            <OfferServiceCard 
+              key={service.id} 
+              service={service} 
+              onEdit={() => handleEditOffer(service.id)}
+              onDelete={() => handleDeleteOffer(service.id)}
+              onToggleActive={(id, isActive) => handleToggleActive(id, isActive)}
+            />
+          )}
+          emptyComponent={<EmptyState text="Aún no tienes servicios" />}
+        />
+      </Panel>
+      {isModalOpen && (
+        <Modal
+          onClose={() => setIsModalOpen(false)}
+          text={isEditing ? "Editar Servicio" : "Agregar Servicio"}
         >
+        <form onSubmit={handleSubmit}>
 
           <Input 
             name="title"
@@ -202,8 +204,8 @@ const OfferManagerContent = () => {
             onChange={handleChange}
             required
           />
-          <Button variant="primary" type="submit">
-            {isEditing ? "Guardar cambios" : "Agregar"}
+          <Button variant="primary" type="submit" disabled={formData.title === initialData.title || formData.price === initialData.price || formData.duration === initialData.duration}>
+            {isMutationPending ? "Guardando..." : (isEditing ? "Guardar cambios" : "Agregar")}
           </Button>
         </form>
 

@@ -4,8 +4,8 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { OfferResponseDTO, UserRole } from '@barber/shared/types';
-import { GetBarber } from '@/common/decorators/get-barber.decorator';
+import { OfferResponseDTO, UserRole } from '@business/shared/types';
+import { GetProfessional } from '@/common/decorators/get-professional.decorator';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 
 @Controller('offers')
@@ -14,48 +14,48 @@ export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
   @Get('me')
-  @Roles(UserRole.BARBER)
-  async findByBarber(
-    @GetBarber() barber: { barberId: string, barbershopId: string },
+  @Roles(UserRole.PROFESSIONAL)
+  async findByProfessional(
+    @GetProfessional() professional: { professionalId: string, businessId: string },
   ): Promise<OfferResponseDTO[]> {
-    return await this.offersService.findAllOffersByBarber(barber.barbershopId, barber.barberId);
+    return await this.offersService.findAllOffersByProfessional(professional.businessId, professional.professionalId);
   }
 
-  @Get('barbershop/:barbershopId/barber/:barberId')
-  @Roles(UserRole.BARBER, UserRole.CUSTOMER)
-  async findAllByBarberId(
-    @Param('barbershopId') barbershopId: string,
-    @Param('barberId') barberId: string,
+  @Get('business/:businessId/professional/:professionalId')
+  @Roles(UserRole.PROFESSIONAL, UserRole.CUSTOMER)
+  async findAllByProfessionalId(
+    @Param('businessId') businessId: string,
+    @Param('professionalId') professionalId: string,
   ): Promise<OfferResponseDTO[]> {
-    return await this.offersService.findAllOffersByBarber(barbershopId, barberId);
+    return await this.offersService.findAllOffersByProfessional(businessId, professionalId);
   }
 
   @Post()
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   async createOffer(
     @Body() createOfferDto: CreateOfferDto, 
-    @GetBarber() barber: { barberId: string, barbershopId: string }
+    @GetProfessional() professional: { professionalId: string, businessId: string }
     ): Promise<OfferResponseDTO> {
-    return await this.offersService.createOfferByBarber(createOfferDto, barber.barbershopId, barber.barberId);
+    return await this.offersService.createOfferByProfessional(createOfferDto, professional.businessId, professional.professionalId);
   }
 
   @Patch(':id')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   async updateOffer(
     @Param('id') id: string, 
     @Body() updateOfferDto: UpdateOfferDto, 
-    @GetBarber() barber: { barberId: string, barbershopId: string }
+    @GetProfessional() professional: { professionalId: string, businessId: string }
     ): Promise<OfferResponseDTO> {
-    return await this.offersService.updateOfferByBarber(id, updateOfferDto, barber.barbershopId, barber.barberId);
+    return await this.offersService.updateOfferByProfessional(id, updateOfferDto, professional.businessId, professional.professionalId);
   }
 
   @Delete(':id')
-  @Roles(UserRole.BARBER)
+  @Roles(UserRole.PROFESSIONAL)
   async removeOffer(
     @Param('id') id: string, 
-    @GetBarber() barber: { barberId: string, barbershopId: string }
+    @GetProfessional() professional: { professionalId: string, businessId: string }
   ): Promise<void> {
-    return await this.offersService.removeOfferByBarber(id, barber.barbershopId, barber.barberId);
+    return await this.offersService.removeOfferByProfessional(id, professional.businessId, professional.professionalId);
   }
 
   

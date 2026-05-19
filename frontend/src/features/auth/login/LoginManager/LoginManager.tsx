@@ -7,9 +7,9 @@ import { Suspense, useState } from "react";
 import { useAuth } from "@/core/auth/context/auth.context";
 import { useParams } from "react-router-dom";
 import { FeatureErrorBoundary } from "@/shared/components/ui";
-import { ApiError, HttpError } from "@barber/shared/errors";
+import { ApiError, HttpError } from "@business/shared/errors";
 import { ERROR_MESSAGES } from "@/shared/constants/error.messages";
-import { ErrorCode } from "@barber/shared/errors";
+import { ErrorCode } from "@business/shared/errors";
 
 const LoginManagerContent = () => {
   const { login, isLoading } = useAuth();

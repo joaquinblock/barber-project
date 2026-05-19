@@ -1,5 +1,5 @@
 import { Expose, Transform } from "class-transformer";
-import { OfferResponseDTO } from "@barber/shared";
+import { OfferResponseDTO } from "@business/shared";
 
 export class OfferResponseDto implements OfferResponseDTO {
     @Expose()
@@ -31,8 +31,8 @@ export class OfferResponseDto implements OfferResponseDTO {
     updatedAt!: string;
     
     @Expose()
-    barberId!: string;
+    professionalId!: string;
     
     @Expose()
-    barbershopId!: string;
+    businessId!: string;
 }

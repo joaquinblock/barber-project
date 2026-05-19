@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { BarbershopModule } from '../barbershop/barbershop.module';
+import { BusinessModule } from '../business/business.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { BarbershopModule } from '../barbershop/barbershop.module';
       }),
     }),
     UsersModule,
-    forwardRef(() => BarbershopModule)
+    forwardRef(() => BusinessModule)
   ],
   controllers: [AuthController],
   providers: [AuthService],

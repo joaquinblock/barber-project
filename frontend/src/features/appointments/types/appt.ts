@@ -1,4 +1,4 @@
-import type { Barber, Customer, DateKey, TimeRangeResponse, OfferDTO, ApptStatus } from "@barber/shared/types";
+import type { Barber, Customer, DateKey, TimeRangeResponse, OfferDTO, ApptStatus } from "@business/shared/types";
 
 
 type BarberAppt = Pick<Barber, 'id'> & {name: string};
